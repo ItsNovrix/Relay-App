@@ -18,11 +18,20 @@ import {
   isBanned,
 } from "devvit-helpers";
 
+// ==========================================================
+// 1. DEVVIT CONFIGURATION
+// ==========================================================
+
 Devvit.configure({
-  redditAPI: true, // Enable access to the Reddit API
+  redditAPI: true,
+  redis: true,
   modLog: false,
   http: true,
 });
+
+// ==========================================================
+// 2. SCHEDULED POSTS JOB
+// ==========================================================
 
 Devvit.addSchedulerJob({
   name: 'scheduled_post_job',
@@ -30,6 +39,8 @@ Devvit.addSchedulerJob({
     const { templateNumber } = event.data!;
     const subreddit = await context.reddit.getCurrentSubreddit();
     
+// --- FETCH TEMPLATE SETTINGS ---
+
     const title = await context.settings.get(`postTemplate${templateNumber}title`) as string;
     const body = await context.settings.get(`postTemplate${templateNumber}body`) as string;
     const sticky = await context.settings.get(`postTemplate${templateNumber}Sticky`) as boolean;
@@ -49,33 +60,102 @@ Devvit.addSchedulerJob({
 
     console.log(`Scheduled Template ${templateNumber} posted successfully!`);
 
+// --- RESCHEDULE OR CANCEL JOB ---
+
+    const repeatWeekly = await context.settings.get(`postTemplate${templateNumber}Repeat`) as boolean;
+    const monthly = await context.settings.get(`postTemplate${templateNumber}Monthly`) as boolean;
+    const monthDay = await context.settings.get(`postTemplate${templateNumber}MonthDay`) as number;
+    const hour = await context.settings.get(`postTemplate${templateNumber}Hour`) as number;
+    const minute = await context.settings.get(`postTemplate${templateNumber}Minute`) as number;
+
+// --- HELPER FUNCTION TO GET MONTHLY CRON EXPRESSION ---
+
+    if (monthly) {
+  const nextMonthDate = new Date();
+  nextMonthDate.setUTCMonth(nextMonthDate.getUTCMonth() + 1);
+
+  const nextCron = getMonthlyCron(monthDay, hour, minute, nextMonthDate);
+
+  await context.scheduler.runJob({
+    name: 'scheduled_post_job',
+    cron: nextCron,
+    data: { templateNumber },
+  });
+
+  console.log(`Monthly Template ${templateNumber} rescheduled for next month.`);
+}
+
     const repeat = await context.settings.get(
       `postTemplate${templateNumber}Repeat`
     ) as boolean;
 
-    if (!repeat && event.job?.id) {
+    if (!repeatWeekly && !monthly && event.job?.id) {
       await context.scheduler.cancelJob(event.job.id);
     }
   },
 });
 
+// ==========================================================
+// 3. SETTINGS & CONFIG
+// ==========================================================
+
 Devvit.addSettings([
-  {
-    type: "boolean",
-    name: "sendModmail",
-    label: "Send to Modmail?",
-    helpText: `Choose this if you’d like to receive a copy in Modmail after each publish and edit (recommended for long announcements).`,
-    defaultValue: true,
+  
+  // --- NOTIFICATION SETTINGS ---
+
+    {
+    type: "group",
+    label: "Relay App Notifications",
+    fields: [
+      {
+        type: "boolean",
+        name: "notify_on_posts",
+        label: "Notify on Post Replies",
+        helpText: `Choose this if you'd like to receive Modmail notifications when users reply to posts or comments made via Relay App.`,
+        defaultValue: false,
+      },
+      {
+        type: "boolean",
+        name: "notify_on_comments",
+        label: "Notify on Comment Replies",
+        helpText: `Choose this if you'd like to receive Modmail notifications when users reply to comments made via Relay App.`,
+        defaultValue: false,
+      },
+      {
+        type: "boolean",
+        name: "notify_ignore_mods",
+        label: "Ignore replies from moderators",
+        helpText: `Choose this if you'd like to ignore replies from moderators when sending notifications.`,
+        defaultValue: true,
+      },
+            {
+        type: "string",
+        name: "notify_extra_users",
+        label: "Also notify for these specified Users (comma-separated, not case-sensitive)",
+        helpText: `Optionally specify additional usernames to be notified of replies (e.g., AutoModerator). Omit the leading /u/.`,
+      },
+    ],
   },
+
+  // --- PUBLISH/EDIT NOTIFICATION SETTINGS ---
+
   {
     type: "group",
-    label: "Discord",
+    label: "Publish/Edit Notifications",
     fields: [
+        {
+        type: "boolean",
+        name: "sendModmail",
+        label: "Send to Modmail?",
+        helpText: `Choose this if you'd like to receive a copy of each Relay App publish and edit in Modmail.`,
+        defaultValue: false,
+      },
       {
         type: "boolean",
         name: "sendDiscord",
         label: "Send to Discord?",
-        helpText: `Choose this if you’d like to receive notifications on your Discord server via webhook. Very long posts may be truncated by Discord.`,
+        helpText: `Choose this if you'd like to receive notifications of each Relay App publish and edit on your Discord server via webhook. Very long posts may be truncated by Discord.`,
+        defaultValue: false,
       },
       {
         type: "string",
@@ -87,51 +167,50 @@ Devvit.addSettings([
         type: "string",
         name: "discordRole",
         label: "Role ID to ping",
-        helpText: `Optional: paste the numeric role ID to @mention (enable “Mentionable” for that role in Discord).`,
+        helpText: `Optional: paste the role ID to @mention (enable "Mentionable" for that role in Discord).`,
       },
     ],
   },
+  
+  // --- AUTO-FLAIR SETTINGS ---
+
   {
     type: "group",
-    label: "Pinned Post Flair after posting",
+    label: "Auto-flair settings",
     fields: [
       {
         name: "setFlairAfterPosting",
         type: "boolean",
         label: `Enable auto-flair after posting?`,
-        helpText:
-          "Automatically set the post’s flair right after a Relay App publish.",
+        helpText: `Automatically set the post flair after a Relay App publish.`,
         defaultValue: false,
       },
       {
         type: "string",
         name: "relayAppPostFlairText",
-        label: "Flair label to apply",
+        label: "Flair label to apply on new posts",
         helpText: `Enter the exact flair label to apply.`,
         defaultValue: `Mod Post`,
       },
-    ],
-  },
-  {
-    type: "group",
-    label: "Pinned Post Flair after commenting",
-    fields: [
       {
         name: "setFlairAfterCommenting",
         type: "boolean",
         label: "Enable auto-flair after commenting?",
-        helpText: `When a moderator comments via Relay App, automatically update the post’s flair.`,
+        helpText: `When a moderator comments via Relay App, automatically update the post flair.`,
         defaultValue: false,
       },
       {
         type: "string",
         name: "relayAppCommentPostFlairText",
-        label: "Flair label to apply",
-        helpText: `Enter the flair label to switch to after a mod replies (e.g., “Mods Replied”).`,
+        label: "Flair label to apply after mod reply",
+        helpText: `Enter the flair label to switch to after a mod replies (e.g., "Mods Replied").`,
         defaultValue: `Mods Replied`,
       },
     ],
   },
+
+  // --- POST TEMPLATE #1 SETTINGS ---
+
   {
     type: "group",
     label: "Post Template 1",
@@ -149,7 +228,7 @@ Devvit.addSettings([
         type: "string",
         label: "Template 1 post title",
         helpText:
-          "Prefilled title when using this template. Note: post titles can’t be edited after publishing.",
+          "Prefilled title when using this template. Note: post titles can't be edited after publishing.",
       },
       {
         name: "postTemplate1body",
@@ -188,6 +267,20 @@ Devvit.addSettings([
         defaultValue: "1",
       },
       {
+      name: "postTemplate1Monthly",
+      type: "boolean",
+      label: "Repeat monthly?",
+      helpText: "Enable this to schedule posts monthly instead of weekly.",
+      defaultValue: false,
+      },
+      {
+      name: "postTemplate1MonthDay",
+      type: "number",
+      label: "Day of month (1-31)",
+      helpText: "Day of the month the post should go out. If the month has fewer days, the post will be scheduled for the last day of the month.",
+      defaultValue: 1,
+      },
+      {
         name: "postTemplate1Hour",
         type: "number",
         label: "Hour (0-23) UTC",
@@ -215,6 +308,9 @@ Devvit.addSettings([
       },
     ],
   },
+
+  // --- POST TEMPLATE #2 SETTINGS ---
+
   {
     type: "group",
     label: "Post Template 2",
@@ -232,7 +328,7 @@ Devvit.addSettings([
         type: "string",
         label: "Template 2 post title",
         helpText:
-          "Prefilled title when using this template. Note: post titles can’t be edited after publishing.",
+          "Prefilled title when using this template. Note: post titles can't be edited after publishing.",
       },
       {
         name: "postTemplate2body",
@@ -271,6 +367,20 @@ Devvit.addSettings([
         defaultValue: "1",
       },
       {
+      name: "postTemplate2Monthly",
+      type: "boolean",
+      label: "Repeat monthly?",
+      helpText: "Enable this to schedule posts monthly instead of weekly.",
+      defaultValue: false,
+      },
+      {
+      name: "postTemplate2MonthDay",
+      type: "number",
+      label: "Day of month (1-31)",
+      helpText: "Day of the month the post should go out. If the month has fewer days, the post will be scheduled for the last day of the month.",
+      defaultValue: 1,
+      },
+      {
         name: "postTemplate2Hour",
         type: "number",
         label: "Hour (0-23) UTC",
@@ -298,6 +408,9 @@ Devvit.addSettings([
       },
     ],
   },
+
+  // --- POST TEMPLATE #3 SETTINGS ---
+
   {
     type: "group",
     label: "Post Template 3",
@@ -315,7 +428,7 @@ Devvit.addSettings([
         type: "string",
         label: "Template 3 post title",
         helpText:
-          "Prefilled title when using this template. Note: post titles can’t be edited after publishing.",
+          "Prefilled title when using this template. Note: post titles can't be edited after publishing.",
       },
       {
         name: "postTemplate3body",
@@ -354,6 +467,20 @@ Devvit.addSettings([
         defaultValue: "1",
       },
       {
+      name: "postTemplate3Monthly",
+      type: "boolean",
+      label: "Repeat monthly?",
+      helpText: "Enable this to schedule posts monthly instead of weekly.",
+      defaultValue: false,
+      },
+      {
+      name: "postTemplate3MonthDay",
+      type: "number",
+      label: "Day of month (1-31)",
+      helpText: "Day of the month the post should go out. If the month has fewer days, the post will be scheduled for the last day of the month.",
+      defaultValue: 1,
+      },
+      {
         name: "postTemplate3Hour",
         type: "number",
         label: "Hour (0-23) UTC",
@@ -381,6 +508,9 @@ Devvit.addSettings([
       },
     ],
   },
+
+  // --- POST TEMPLATE #4 SETTINGS ---
+
   {
     type: "group",
     label: "Post Template 4",
@@ -398,7 +528,7 @@ Devvit.addSettings([
         type: "string",
         label: "Template 4 post title",
         helpText:
-          "Prefilled title when using this template. Note: post titles can’t be edited after publishing.",
+          "Prefilled title when using this template. Note: post titles can't be edited after publishing.",
       },
       {
         name: "postTemplate4body",
@@ -437,6 +567,20 @@ Devvit.addSettings([
         defaultValue: "1",
       },
       {
+      name: "postTemplate4Monthly",
+      type: "boolean",
+      label: "Repeat monthly?",
+      helpText: "Enable this to schedule posts monthly instead of weekly.",
+      defaultValue: false,
+      },
+      {
+      name: "postTemplate4MonthDay",
+      type: "number",
+      label: "Day of month (1-31)",
+      helpText: "Day of the month the post should go out. If the month has fewer days, the post will be scheduled for the last day of the month.",
+      defaultValue: 1,
+      },
+      {
         name: "postTemplate4Hour",
         type: "number",
         label: "Hour (0-23) UTC",
@@ -464,6 +608,9 @@ Devvit.addSettings([
       },
     ],
   },
+
+  // --- POST TEMPLATE #5 SETTINGS ---
+
   {
     type: "group",
     label: "Post Template 5",
@@ -481,7 +628,7 @@ Devvit.addSettings([
         type: "string",
         label: "Template 5 post title",
         helpText:
-          "Prefilled title when using this template. Note: post titles can’t be edited after publishing.",
+          "Prefilled title when using this template. Note: post titles can't be edited after publishing.",
       },
       {
         name: "postTemplate5body",
@@ -520,6 +667,20 @@ Devvit.addSettings([
         defaultValue: "1",
       },
       {
+      name: "postTemplate5Monthly",
+      type: "boolean",
+      label: "Repeat monthly?",
+      helpText: "Enable this to schedule posts monthly instead of weekly.",
+      defaultValue: false,
+      },
+      {
+      name: "postTemplate5MonthDay",
+      type: "number",
+      label: "Day of month (1-31)",
+      helpText: "Day of the month the post should go out. If the month has fewer days, the post will be scheduled for the last day of the month.",
+      defaultValue: 1,
+      },
+      {
         name: "postTemplate5Hour",
         type: "number",
         label: "Hour (0-23) UTC",
@@ -549,6 +710,12 @@ Devvit.addSettings([
   },
 ]),
 
+// ==========================================================
+// 4. TRIGGERS
+// ==========================================================
+
+// --- APP INSTALL MESSAGE ---
+
 Devvit.addTrigger({
   event: "AppInstall",
   async onEvent(event, context) {
@@ -560,41 +727,43 @@ Devvit.addTrigger({
     var firstMsg = `Hello r/${subreddit.name} mods,\n\n`;
 
     ((firstMsg += `Thanks for installing **Relay App**!\n\n`),
-      (firstMsg += `This tool helps your team publish and manage official mod posts and pinned mod comments — fast, consistent, and without shared accounts.\n\n`));
+      (firstMsg += `Relay App helps your team publish and manage official mod posts and pinned mod comments — fast, consistent, and without shared accounts.\n\n`));
 
     /* QUICK START */
-    ((firstMsg += `**How to use it:**\n\n\n`),
-      (firstMsg += `1) Open **Relay App → New Post** (or **New Comment**)\n`),
-      (firstMsg += `2) Write your content, toggle **Distinguish** / **Sticky** as needed\n`),
+    ((firstMsg += `**How to use Relay App:**\n\n\n`),
+      (firstMsg += `1) Open **Relay App → New Post** or **New Comment**\n`),
+      (firstMsg += `2) Write your content, toggle **Sticky** / **Lock** as needed\n`),
       (firstMsg += `3) **Publish** — done!\n\n`),
-      (firstMsg += `*Note:* Post **titles cannot be edited** after publishing (Reddit limitation). Double-check before you post.\n\n`));
+      (firstMsg += `*Note:* Post titles **cannot be edited** after publishing due to Reddit limitations. Double-check before you post.\n\n`));
 
     /* DEFAULTS & NOTIFICATIONS */
     ((firstMsg += `**Defaults & notifications:**\n\n\n`),
       (firstMsg += `- An **internal mod note** is added automatically after each publish (shows who posted + direct link).\n`),
-      (firstMsg += `- **Modmail notifications are ON by default** on submit and on edit of a mod post — great for long announcements so the team always has a copy.\n`),
+      (firstMsg += `- **Reply notifications are OFF by default** but can easily be enabled in the app settings.\n`),
+      (firstMsg += `- **Reply notifications only monitor the first 24 hours** after a post/comment is made by Relay App due to Reddit limitations.\n`),
+      (firstMsg += `- **Publish/edit notifications are OFF by default** on submit and on edit of a mod post.\n`),
       (firstMsg += `- **Discord notifications** are supported if you add a webhook in settings. Heads-up: very long posts may hit Discord payload limits.\n\n`));
 
     /* FEATURES */
     ((firstMsg += `**Features you can use today:**\n\n\n`),
       (firstMsg += `- Publish **official mod posts** (text) with one-click **Distinguish**, **Sticky**, and **Lock**.\n`),
-      (firstMsg += `- Publish **pinned mod comments** (also with **Distinguish**, **Sticky**, and **Lock**).\n`),
-      (firstMsg += `- **Auto-flair after posting** — automatically apply a flair (e.g., *Mod Post*) to posts created via Relay App.\n`),
-      (firstMsg += `- **Auto-flair after commenting** — when a **mod replies via Relay App**, the post flair can auto-switch (e.g., *Mods Replied*).\n`),
-      (firstMsg += `- **Post Templates** — save up to **5** reusable templates per subreddit. Add them in settings, then select **Use template** when creating a post.\n`),
-      (firstMsg += `- Schedule up to **5** post templates to automatically publish at specific times weekly (with optional **Sticky** and **Lock**).\n`),
-      (firstMsg += `- **Clone Post** — click **Clone** on any previous post to rapidly reuse it (perfect for monthly stickies & AMA re-runs).\n`),
+      (firstMsg += `- Publish **official mod comments** (also with **Distinguish**, **Sticky**, and **Lock**).\n`),
+      (firstMsg += `- **Auto-flair after posting** — Automatically apply a flair (e.g., *Mod Post*) to posts created via Relay App.\n`),
+      (firstMsg += `- **Auto-flair after commenting** — When a **mod replies via Relay App**, the post flair can auto-switch (e.g., *Mods Replied*).\n`),
+      (firstMsg += `- **Post Templates** — Save up to **5** reusable templates per subreddit. Add them in settings, then select **Use template** when creating a post.\n`),
+      (firstMsg += `- **Post Scheduling** — Schedule up to **5** post templates to automatically publish at specific times weekly (with optional **Sticky** and **Lock**).\n`),
+      (firstMsg += `- **Clone Post** — Click **Clone** on any previous post to rapidly reuse it (perfect for monthly stickies & AMA re-runs).\n`),
       (firstMsg += `- **Permanent delete** of posts/comments created via the app (not just remove) — use with care.\n`),
       (firstMsg += `- Permissions required: **Post** or **Everything**.\n\n`));
 
     /* CONFIG LINKS */
-    ((firstMsg += `**Configure now:** manage templates, auto-flair, and Discord here → `),
+    ((firstMsg += `**Configure now:** manage templates, auto-flair, and Discord settings here → `),
       (firstMsg += `[ Relay App settings](https://developers.reddit.com/r/${subreddit.name}/apps/relay-app)\n\n`));
 
     /* FOOTER */
-    ((firstMsg += `[Terms & Conditions](https://www.reddit.com/r/RelayLabs/wiki/terms-and-conditions/) | `),
-      (firstMsg += `[Privacy Policy](https://www.reddit.com/r/RelayLabs/wiki/privacy-policy/) | `),
-      (firstMsg += `[Contact](https://reddit.com/r/RelayLabs)\n\n`));
+    ((firstMsg += `[Terms & Conditions](https://www.reddit.com/r/RelayApp/wiki/terms-and-conditions/) | `),
+      (firstMsg += `[Privacy Policy](https://www.reddit.com/r/RelayApp/wiki/privacy-policy/) | `),
+      (firstMsg += `[Contact](https://reddit.com/r/RelayApp)\n\n`));
 
     await context.reddit.sendPrivateMessageAsSubreddit({
       fromSubredditName: subreddit.name,
@@ -614,6 +783,8 @@ Devvit.addTrigger({
   },
 });
 
+// --- APP UPGRADE MESSAGE ---
+
 Devvit.addTrigger({
   event: "AppUpgrade",
   async onEvent(event, context) {
@@ -625,35 +796,34 @@ Devvit.addTrigger({
     var firstMsg = `Hello r/${subreddit.name} mods,\n\n`;
 
     ((firstMsg += `Thanks for **updating Relay App**!\n\n`),
-      (firstMsg += `This tool helps your team publish and manage official mod posts and mod comments — fast, consistent, and without shared accounts.\n\n`));
+      (firstMsg += `Relay App helps your team publish and manage official mod posts and mod comments — fast, consistent, and without shared accounts.\n\n`));
 
     /* WHAT'S NEW */
-    ((firstMsg += `**What’s new (highlights):**\n\n\n`),
-      (firstMsg += `- Schedule up to **5** post templates to automatically publish at specific times weekly (with optional **Sticky** and **Lock**).\n`),
+    ((firstMsg += `**What's new (highlights):**\n\n\n`),
+      (firstMsg += `- **Post Scheduling** — Relay app now supports weekly and monthly post scheduling (with optional **Sticky** and **Lock**).\n`),
+      (firstMsg += `- **Relay App reply notifications** — Relay App can now notify you when someone replies to a post/comment created by Relay App.\n`),
       (firstMsg += `- **Lock Relay App posts/comments** — Functionality has been implemented to allow locking of Relay App posts/comments.\n\n`),
-      (firstMsg += `- **Post Templates** — you can save up to **5** reusable templates per subreddit. Add them in the app settings and then use **Use template** when creating a post.\n\n`),
-      (firstMsg += `- **Auto-flair after posting** — automatically apply a flair (e.g., *Mod Post*) to every post published via Relay App.\n\n`),
-      (firstMsg += `- **Auto-flair after commenting** — when a **mod replies via Relay App**, the post flair can automatically switch (e.g., *Mods Replied*).\n\n`),
-      (firstMsg += `- **Clone Post** — click **Clone** on any previous post to create a new one. Super fast for monthly stickies and AMA re-runs.\n\n`));
 
     /* REMINDERS */
     ((firstMsg += `**Good to know / reminders:**\n\n\n`),
-      (firstMsg += `- Titles **cannot be edited** after publishing (Reddit limitation). Double-check before posting.\n\n`),
+      (firstMsg += `- Titles **cannot be edited** after publishing due to Reddit limitations. Double-check before posting.\n\n`),
       (firstMsg += `- An **internal mod note** is automatically added after each publish, showing who posted and linking to the content.\n\n`),
-      (firstMsg += `- **Modmail notifications are ON by default** on submit and on edit — great for long announcements so your team always has a copy.\n\n`),
+      (firstMsg += `- **Reply notifications are OFF by default** but can easily be enabled in the app settings.\n`),
+      (firstMsg += `- **Reply notifications only monitor the first 24 hours** after a post/comment is made by Relay App due to Reddit limitations.\n`),
+      (firstMsg += `- **Publish/edit notifications are OFF by default** on submit and on edit of a mod post.\n`),
       (firstMsg += `- **Discord notifications** are supported (add your webhook in settings). Note: very long bodies may hit Discord’s payload limits.\n\n`),
       (firstMsg += `- You can **permanently delete** posts/comments created by the app (not just remove) — use with care.\n\n`),
-      (firstMsg += `- To use the app, you need **Post** or **Everything** permissions.\n\n`));
+      (firstMsg += `- To use the app, you need **Post** or **Everything** permissions.\n\n`)));
 
     /* CONFIG LINKS */
-    ((firstMsg += `**Configure now:** manage templates, auto-flair, and Discord here → [Relay App settings](https://developers.reddit.com/r/${subreddit.name}/apps/relay-app)\n\n\n`),
+    ((firstMsg += `**Configure now:** manage templates, scheduling, notifications, and more settings here → [Relay App settings](https://developers.reddit.com/r/${subreddit.name}/apps/relay-app)\n\n\n`),
       /* COMING SOON */
-      (firstMsg += `**Coming soon:** monthly scheduled posting!\n\n`));
+      (firstMsg += `**Coming soon:** Auto-unsticky for scheduled posts!\n\n`));
 
     /* FOOTER */
-    ((firstMsg += `[Terms & Conditions](https://www.reddit.com/r/RelayLabs/wiki/terms-and-conditions/) | `),
-      (firstMsg += `[Privacy Policy](https://www.reddit.com/r/RelayLabs/wiki/privacy-policy/) | `),
-      (firstMsg += `[Contact](https://reddit.com/r/RelayLabs)\n\n`));
+    ((firstMsg += `[Terms & Conditions](https://www.reddit.com/r/RelayApp/wiki/terms-and-conditions/) | `),
+      (firstMsg += `[Privacy Policy](https://www.reddit.com/r/RelayApp/wiki/privacy-policy/) | `),
+      (firstMsg += `[Contact](https://reddit.com/r/RelayApp)\n\n`));
 
     await context.reddit.sendPrivateMessageAsSubreddit({
       fromSubredditName: subreddit.name,
@@ -671,6 +841,66 @@ Devvit.addTrigger({
     });
   },
 });
+
+// --- REPLY NOTIFICATIONS LISTENER ---
+
+Devvit.addTrigger({
+  event: 'CommentCreate',
+  onEvent: async (event, context) => {
+    if (!event.comment || !event.author?.name) return;
+
+    // Cache comment author for 24 hours to identify replies later
+    await context.redis.set(`author:${event.comment.id}`, event.author.name, { expiration: new Date(Date.now() + 86400000) });
+
+    const settings = await context.settings.getAll();
+    const appUser = await context.reddit.getAppUser();
+    const extraUsers = (settings.notify_extra_users as string || "").split(',').map(u => u.trim().toLowerCase());
+    
+    const parentId = event.comment.parentId;
+    const isReplyToPost = parentId.startsWith('t3_');
+    const isReplyToComment = parentId.startsWith('t1_');
+
+    let parentAuthor = "";
+    if (isReplyToPost) {
+      const post = await context.reddit.getPostById(parentId);
+      parentAuthor = post.authorName ?? "[deleted]"; 
+    } else if (isReplyToComment) {
+      parentAuthor = (await getCommentAuthor(parentId, context)) ?? "[deleted]";
+    }
+
+    // Check if the person being replied to is Relay App or other monitored user
+    const isMonitored = parentAuthor.toLowerCase() === appUser.username.toLowerCase() || extraUsers.includes(parentAuthor.toLowerCase());
+    if (!isMonitored) return;
+
+    // Check if notifications are enabled for this type of reply
+    if (isReplyToPost && !settings.notify_on_posts) return;
+    if (isReplyToComment && !settings.notify_on_comments) return;
+
+    // Filter out moderators if that setting is enabled
+    if (settings.notify_ignore_mods && await isModerator(event.author.name, context)) return;
+
+   // Send Modmail notification
+    await context.reddit.modMail.createModInboxConversation({
+      subredditId: context.subredditId,
+      subject: "Relay App: New Reply Received",
+      bodyMarkdown: `u/${event.author.name} has replied to a ${isReplyToPost ? 'post' : 'comment'} by ${parentAuthor}.
+
+**Comment Text:**
+> ${event.comment.body}
+
+[View Reply](https://www.reddit.com${event.comment.permalink})
+
+---
+*I am a bot, and this action was triggered automatically.*`,
+    });
+  },
+});
+
+//=========================================================
+// 6. CONTEXT MENUS
+// ========================================================
+
+// --- SUBMIT POST FORM ---
 
 const submitForm = Devvit.createForm(
   {
@@ -710,7 +940,7 @@ const submitForm = Devvit.createForm(
     ],
     acceptLabel: "Post",
     description:
-      "This is a form for submitting a post through mod Relay App. You can edit the post later.",
+      "This is a form for submitting a mod post through Relay App. You can edit the post later.",
     cancelLabel: "Cancel",
   },
   async (_event, context) => {
@@ -873,6 +1103,8 @@ const submitForm = Devvit.createForm(
   },
 );
 
+// --- CONTEXT MENU ITEM: SUBMIT MOD POST ---
+
 Devvit.addMenuItem({
   location: "subreddit",
   label: "[Relay App] - Submit mod post",
@@ -900,6 +1132,8 @@ Devvit.addMenuItem({
     }
   },
 });
+
+// --- EDIT MOD POST FORM ---
 
 const editForm = Devvit.createForm(
   (data) => ({
@@ -1010,16 +1244,6 @@ const editForm = Devvit.createForm(
       redditId: originalPost,
     });
 
-    /* await context.modLog
-        .add({
-          action: 'edit_scheduled_post',
-          target: originalPost,
-          details: `Edited mod post`,
-        })
-        .catch((e: any) =>
-          console.error(`Failed to add modlog for: ${originalPost}.`, e.message)
-        ); */
-
     var logMsg = `Title: ${getPost.title}\n\n`;
     ((logMsg += `URL: https://reddit.com${getPost.permalink}\n\n`),
       (logMsg += `Moderator: ${modEditor}\n\n`));
@@ -1129,6 +1353,8 @@ const editForm = Devvit.createForm(
   },
 );
 
+// --- CONTEXT MENU ITEM: EDIT MOD POST ---
+
 Devvit.addMenuItem({
   location: "post",
   label: "[Relay App] - Edit post",
@@ -1177,6 +1403,8 @@ Devvit.addMenuItem({
   },
 });
 
+// --- SUBMIT COMMENT REPLY FORM ---
+
 const submitCommentReply = Devvit.createForm(
   {
     title: "Submit a comment",
@@ -1209,7 +1437,7 @@ const submitCommentReply = Devvit.createForm(
     ],
     acceptLabel: "Publish",
     description:
-      "This is a form for submitting a reply to comment through mod Relay App. You can edit the comment later.",
+      "This is a form for submitting a mod comment through Relay App. You can edit the comment later.",
     cancelLabel: "Cancel",
   },
   async (_event, context) => {
@@ -1278,6 +1506,8 @@ const submitCommentReply = Devvit.createForm(
   },
 );
 
+// --- CONTEXT MENU ITEM: SUBMIT MOD COMMENT REPLY ---
+
 Devvit.addMenuItem({
   location: ["post", "comment"],
   label: "[Relay App] - Comment",
@@ -1323,6 +1553,8 @@ Devvit.addMenuItem({
   },
 });
 
+// --- CONTEXT MENU ITEM: EDIT MOD COMMENT ---
+
 Devvit.addMenuItem({
   location: "comment",
   label: "[Relay App] - Edit comment",
@@ -1367,6 +1599,8 @@ Devvit.addMenuItem({
     }
   },
 });
+
+// --- EDIT MOD COMMENT FORM ---
 
 const editComment = Devvit.createForm(
   (data) => ({
@@ -1466,16 +1700,6 @@ const editComment = Devvit.createForm(
       redditId: originalComment,
     });
 
-    /* await context.modLog
-          .add({
-            action: 'edit_scheduled_post',
-            target: originalPost,
-            details: `Edited mod post`,
-          })
-          .catch((e: any) =>
-            console.error(`Failed to add modlog for: ${originalPost}.`, e.message)
-          ); */
-
     var logMsg = `Comment URL: https://reddit.com${getComment.permalink}\n\n`;
     logMsg += `Moderator: ${modEditor}\n\n`;
     logMsg += `Previous version: ${oldBody}\n\n`;
@@ -1494,6 +1718,8 @@ const editComment = Devvit.createForm(
     }
   },
 );
+
+// --- CONTEXT MENU ITEM: DELETE MOD POST ---
 
 Devvit.addMenuItem({
   location: ["post"],
@@ -1534,6 +1760,8 @@ Devvit.addMenuItem({
   },
 });
 
+// --- CONTEXT MENU ITEM: DELETE MOD COMMENT ---
+
 Devvit.addMenuItem({
   location: ["comment"],
   forUserType: "moderator",
@@ -1572,6 +1800,8 @@ Devvit.addMenuItem({
     }
   },
 });
+
+// --- CONTEXT MENU ITEM: SUBMIT MOD POST USING TEMPLATE ---
 
 Devvit.addMenuItem({
   location: "subreddit",
@@ -1615,23 +1845,23 @@ Devvit.addMenuItem({
     )) as Paragraph;
 
     const template4name = (await context?.settings.get(
-      "postTemplate3name",
+      "postTemplate4name",
     )) as string;
     const template4title = (await context?.settings.get(
-      "postTemplate3title",
+      "postTemplate4title",
     )) as string;
     const template4body = (await context?.settings.get(
-      "postTemplate3body",
+      "postTemplate4body",
     )) as Paragraph;
 
     const template5name = (await context?.settings.get(
-      "postTemplate3name",
+      "postTemplate5name",
     )) as string;
     const template5title = (await context?.settings.get(
-      "postTemplate3title",
+      "postTemplate5title",
     )) as string;
     const template5body = (await context?.settings.get(
-      "postTemplate3body",
+      "postTemplate5body",
     )) as Paragraph;
 
     const botAccount = (await context.reddit.getAppUser()).username;
@@ -1667,6 +1897,8 @@ Devvit.addMenuItem({
     }
   },
 });
+
+// --- USE TEMPLATE FORM ---
 
 const useTemplate = Devvit.createForm(
   (data) => ({
@@ -1778,6 +2010,8 @@ const useTemplate = Devvit.createForm(
     }
   },
 );
+
+// --- USE TEMPLATE ONE FORM ---
 
 const useTemplateOne = Devvit.createForm(
   (data) => ({
@@ -1979,6 +2213,8 @@ const useTemplateOne = Devvit.createForm(
   },
 );
 
+// --- USE TEMPLATE TWO FORM ---
+
 const useTemplateTwo = Devvit.createForm(
   (data) => ({
     fields: [
@@ -2178,6 +2414,8 @@ const useTemplateTwo = Devvit.createForm(
     }
   },
 );
+
+// --- USE TEMPLATE THREE FORM ---
 
 const useTemplateThree = Devvit.createForm(
   (data) => ({
@@ -2379,6 +2617,8 @@ const useTemplateThree = Devvit.createForm(
   },
 );
 
+// --- USE TEMPLATE FOUR FORM ---
+
 const useTemplateFour = Devvit.createForm(
   (data) => ({
     fields: [
@@ -2578,6 +2818,8 @@ const useTemplateFour = Devvit.createForm(
     }
   },
 );
+
+// --- USE TEMPLATE FIVE FORM ---
 
 const useTemplateFive = Devvit.createForm(
   (data) => ({
@@ -2779,6 +3021,8 @@ const useTemplateFive = Devvit.createForm(
   },
 );
 
+// --- CONTEXT MENU ITEM: APPLY SCHEDULED POSTS ---
+
 Devvit.addMenuItem({
   location: "subreddit",
   label: "[Relay App] - Apply Scheduled Posts",
@@ -2789,6 +3033,8 @@ Devvit.addMenuItem({
     context.ui.showToast('Scheduled posts updated successfully!');
   },
 });
+
+// --- CONTEXT MENU ITEM: CLONE POST ---
 
 Devvit.addMenuItem({
   location: "post",
@@ -2960,10 +3206,31 @@ Devvit.addMenuItem({
   },
 });
 
+// ==========================================
+// SCHEDULER SETUP
+// ==========================================
+
+// --- HELPER TO GENERATE CRON EXPRESSION FOR MONTHLY SCHEDULING ---
+
+function getMonthlyCron(monthDay: number, hour: number, minute: number, targetDate: Date = new Date()): string {
+  if (monthDay < 1) monthDay = 1;
+  if (monthDay > 31) monthDay = 31;
+
+  const year = targetDate.getUTCFullYear();
+  const month = targetDate.getUTCMonth();
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const day = Math.min(monthDay, daysInMonth);
+
+  return `${minute} ${hour} ${day} * *`;
+}
+
+// --- APPLY SCHEDULED POSTS BASED ON SAVED SETTINGS ---
+
 async function applySchedules(context: Devvit.Context) {
   const scheduler = context.scheduler;
 
-  // 1. Clear existing jobs
+// --- CLEAR EXISTING SCHEDULED JOBS ---
+
   const currentJobs = await scheduler.listJobs();
   await Promise.all(
     currentJobs
@@ -2971,19 +3238,28 @@ async function applySchedules(context: Devvit.Context) {
       .map((job) => scheduler.cancelJob(job.id))
   );
 
-  // 2. Recreate schedules from SAVED settings
+// --- SET UP NEW SCHEDULED JOBS BASED ON SETTINGS ---
+
   for (const i of [1, 2, 3, 4, 5]) {
     const enabled = await context.settings.get(`postTemplate${i}Enabled`) as boolean;
     if (!enabled) continue;
 
-    const day = await context.settings.get(`postTemplate${i}Day`) as string;
+    const weekly = await context.settings.get(`postTemplate${i}Repeat`) as boolean;
+    const weeklyDay = await context.settings.get(`postTemplate${i}Day`) as string;
+    const monthly = await context.settings.get(`postTemplate${i}Monthly`) as boolean;
+    const monthDay = await context.settings.get(`postTemplate${i}MonthDay`) as number;
     const hour = await context.settings.get(`postTemplate${i}Hour`) as number;
     const minute = await context.settings.get(`postTemplate${i}Minute`) as number;
-    const repeat = await context.settings.get(`postTemplate${i}Repeat`) as boolean;
 
-    const cron = repeat
-      ? `${minute} ${hour} * * ${day}`   // weekly
-      : `${minute} ${hour} * * *`;      // one-time (handled in job)
+// --- DETERMINE CRON EXPRESSION BASED ON SCHEDULE TYPE ---
+
+    const cron = weekly
+      ? `${minute} ${hour} * * ${weeklyDay}`   // Weekly
+      : monthly
+        ? getMonthlyCron(monthDay, hour, minute)   // Monthly
+        : `${minute} ${hour} * * ${weeklyDay}`;      // One-time on selected day
+
+// --- SCHEDULE THE JOB ---
 
     await scheduler.runJob({
       name: 'scheduled_post_job',
@@ -2993,5 +3269,32 @@ async function applySchedules(context: Devvit.Context) {
   }
 }
 
+// ==========================================
+// HELPERS FOR NOTIFICATIONS
+// ==========================================
+
+// --- CACHES COMMENT AUTHOR NAMES TO REDUCE API CALLS ---
+async function getCommentAuthor(commentId: string, context: any): Promise<string> {
+  const cachedAuthor = await context.redis.get(`author:${commentId}`);
+  if (cachedAuthor) return cachedAuthor;
+  try {
+    const comment = await context.reddit.getCommentById(commentId);
+    return comment.authorName ?? "[deleted]"; // Return "[deleted]" if author is null
+  } catch {
+    return "[deleted]"; // Return "[deleted]" if comment retrieval fails
+  }
+}
+
+// --- CHECKS IF A USER IS A MODERATOR OF THE SUBREDDIT ---
+async function isModerator(username: string, context: any): Promise<boolean> {
+  const subredditName = context.subredditName ?? (await context.reddit.getCurrentSubredditName());
+  if (username === `${subredditName}-ModTeam` || username === "AutoModerator") return true;
+  try {
+    const moderators = await context.reddit.getModerators({ subredditName, username }).all();
+    return moderators.length > 0;
+  } catch {
+    return false;
+  }
+}
 
 export default Devvit;

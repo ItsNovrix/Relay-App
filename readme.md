@@ -11,7 +11,7 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 - **Publish Official Mod Posts** (text only) — With one-click **Sticky** and **Lock** options.
 - **Publish Official Mod Comments** (text only) — With one-click **Sticky** and **Lock** options.
 - **Post Templates** — Create up to **5 reusable post templates** that can quickly be deployed as needed.
-- **Post Scheduling** — Use post templates to automate up to **5 posts** with custom times on a weekly interval.
+- **Post Scheduling** — Use post templates to automate up to **5 posts** with custom times on a weekly or monthly interval.
 - **Automatic Distinguishing** — Clearly identify posts and comments as mod team communications.
 - **Automatic Internal Mod Note** — Shows user who posted/commented via Relay App and links directly to the post/comment.
 - **Audit Trail** — All actions performed using Relay App are logged in the mod log for transparency and a clear audit trail.
@@ -20,15 +20,22 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 - **Auto-Flair (optional)** — Apply a chosen post flair after submitting a post, or automatically change post flair after replying to a post.
 - **Permanent Delete** — Posts/comments created via Relay App can be permantently deleted (not just marked as "removed").
 
-> **Coming Soon:** **Reply notifications** — Get notified via modmail when a user replies to a Relay App post or comment
+> **Coming Soon:** **Auto-unsticky for scheduled posts** — Automatically unsticky old posts when new sticky posts go live. 
 
 ---
 
 ## What's New?
 
-### Post scheduling
+### Monthly post scheduling
 
-Relay App now includes a scheduling system that allows moderators to automate posts with custom times on a weekly interval.
+Relay App now includes enhanced post scheduling, allowing for scheduling post templates on a weekly or monthly interval.
+
+### Reply notifications
+
+Relay App now includes functionality to notify via modmail when a user replies to a Relay App post or comment.
+
+- Optional toggle to ignore replies from mod accounts.
+- Optional functionality to notify for additional specified users (e.g., AutoModerator and -ModTeam accounts).
 
 ### Lock posts/comments
 
@@ -113,7 +120,7 @@ These issues can be quite frustrating for moderators in need of automating more 
 
 - By capping our template system at five slots, Relay App intentionally leaves one permanent manual slot open. This ensures your mod team always has room to manually sticky an emergency announcement, a breaking news thread, or other post without the app accidentally overwriting it.
 
-> **Coming Soon:** Support for monthly post scheduling intervals.
+> **Coming Soon:** **Auto-unsticky for scheduled posts** — Automatically unsticky old posts when new sticky posts go live.
 
 ### Using the Scheduling System
 
@@ -127,7 +134,7 @@ The scheduling system works with the Post Template system to automate subreddit 
 
 > **Note:** If **"Repeat Weekly?"** is toggled off, posts will not run again unless manually re-applied.
 
-> **Coming Soon:** Support for monthly post scheduling intervals.
+> **Coming Soon:** **Auto-unsticky for scheduled posts** — Automatically unsticky old posts when new sticky posts go live.
 
 ---
 
@@ -144,8 +151,11 @@ Need to refresh a monthly sticky or re-run an AMA post? Use **Clone** to copy an
 
 ## 🔔 Notifications & Logs
 
-- **Modmail (default ON):** sent on **submit** and on **edit** for mod posts. Keeps a durable copy for the team.
+- **Modmail notifications (default OFF):** sent on **submit** and on **edit** for mod posts. Keeps a durable copy for the team.
   – Useful for long announcements: if someone accidentally removes/overwrites content, you’ll still have the copy in modmail.
+- **Reply notifications (default OFF):** sent when a user replies to a Relay App post or comment. Useful to keep up with responses to Relay App posts/comments.
+  - Optional toggle to ignore replies from mod accounts.
+  - Optional functionality to notify for additional specified users (e.g., AutoModerator and -ModTeam accounts).
 - **Discord (optional):** posts to your configured webhook (subject to Discord limits).
   - **Note:** Very long posts can hit Discord payload limits and may fail to deliver!
 - **Internal mod notes:** created automatically after publishing, with the actor and direct link.
@@ -154,15 +164,15 @@ Need to refresh a monthly sticky or re-run an AMA post? Use **Clone** to copy an
 
 ## 🔒 Mods Only
 
-- Manage Relay App options in **Dev Settings** (templates, auto-flair, Discord webhook, defaults).
+- Manage Relay App options in **Devvit Settings** (templates, auto-flair, Discord webhook, defaults).
 - All content remains subject to your subreddit’s rules and Reddit policies.
 
 ---
 
 ## 📚 Resources
 
-- [Terms & Conditions](https://www.reddit.com/r/RelayLabs/wiki/terms-and-conditions/)
-- [Privacy Policy](https://www.reddit.com/r/RelayLabs/wiki/privacy-policy/)
+- [Terms & Conditions](https://www.reddit.com/r/RelayApp/wiki/terms-and-conditions/)
+- [Privacy Policy](https://www.reddit.com/r/RelayApp/wiki/privacy-policy/)
 
 ---
 
@@ -177,7 +187,7 @@ This app was developed in compliance with [Reddit's Developer Terms](https://dev
 
 ## 🆘 Feedback & Support
 
-If you have any feedback/suggestions or need support, visit [r/RelayLabs](https://www.reddit.com/r/RelayLabs).
+If you have any feedback/suggestions or need support, visit [r/RelayApp](https://www.reddit.com/r/RelayApp).
 
 ---
 
@@ -193,5 +203,8 @@ If you have any feedback/suggestions or need support, visit [r/RelayLabs](https:
 * v0.0.8: Implemented scheduling system, updated ReadMe.
 * v0.0.9: Updated ReadMe
 * v0.0.10: Updated ReadMe and resources links.
+* v0.0.11: Implemented reply notifications for Relay App posts/comments, reconfigured app settings cleaned up dead code, reorganized code.
+* v0.0.12: Updated ReadMe resource links and main.ts resource links due to changed subreddit for Relay App.
+* v0.0.13: Implemented logic for monthly post scheduling. Updated ReadMe.
 
 Thanks for using **Relay App** — publish faster, safer, and without shared accounts!

@@ -15,16 +15,20 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 - **Automatic Distinguishing** — Clearly identify posts and comments as mod team communications.
 - **Automatic Internal Mod Note** — Shows user who posted/commented via Relay App and links directly to the post/comment.
 - **Audit Trail** — All actions performed using Relay App are logged in the mod log for transparency and a clear audit trail.
-- **Modmail Notifications (default ON)** — Receive a modmail notification on submit **and** on edit of a mod post.
+- **Modmail Notifications (default OFF)** — Modmail notifications for submitting/editing posts/comments and replies to Relay App posts/comments.
 - **Discord Notifications (optional)** — Receive notifications in a Discord server on submit **and** on edit of a mod post via webhook URL.
 - **Auto-Flair (optional)** — Apply a chosen post flair after submitting a post, or automatically change post flair after replying to a post.
 - **Permanent Delete** — Posts/comments created via Relay App can be permantently deleted (not just marked as "removed").
 
-> **Coming Soon:** **Auto-unsticky for scheduled posts** — Automatically unsticky old posts when new sticky posts go live. 
+> **Coming Soon:** **Image posting** — Post/comment images via Relay App! 
 
 ---
 
 ## What's New?
+
+### Auto-unsticky/lock for scheduled posts
+
+Functionality has been implemented to allow Relay App to automatically unsticky and/or lock stickied posts that were previously published and stickied via post scheduling. 
 
 ### Monthly post scheduling
 
@@ -36,10 +40,6 @@ Relay App now includes functionality to notify via modmail when a user replies t
 
 - Optional toggle to ignore replies from mod accounts.
 - Optional functionality to notify for additional specified users (e.g., AutoModerator and -ModTeam accounts).
-
-### Lock posts/comments
-
-Functionality has been implemented to allow locking of Relay App posts/comments.
 
 ---
 
@@ -97,44 +97,57 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 - You can store **up to 5** templates per subreddit.
 - In the Relay App menu choose **Use template** to prefill **Title** and **Body**; you can still edit before publishing.
 - Works with **any language/locale** (great for AMA announcements, rules changes, monthly stickies, etc.).
+- Optional post template features include:
+  - Schedule post templates to be submitted ahead of time (once).
+  - Schedule post templates to repeat at **weekly** or **monthly** intervals.
+  - Automatically sticky and/or lock posts upon posting.
+  - Automatically unsticky and/or lock previous stickied post templates.
 
 ---
 
 ## 📅 Post Scheduling
 
-Relay App features a custom-built scheduling engine designed to overcome the rigid limitations of Reddit's native post scheduler. The scheduling system works in conjunction with the post template system to automate the posting of selected post templates to your subreddit. 
+Relay App features a custom-built scheduling engine designed to overcome the rigid limitations of Reddit's native post scheduler. The scheduling system works in conjunction with the post template system to optionally automate the posting of selected post templates to your subreddit. 
 
 While Reddit's built-in scheduler is a useful tool, it has a few significant constraints:
 
-- Native Reddit scheduling only allows you to automate a total of **2 stickied posts**. If you want more, you have to manually sticky them.
+- Reddit's native post scheduling system only allows you to automate a total of **2 stickied posts**. If you want more than two posts to be stickied at a time, you have to manually sticky anything past the first two.
 
-- Because the native system is capped at two automated slots, trying to automate stickied posts or events after the limit has been reached results in bumping off existing stickied posts, requiring moderators to re-sticky posts they still need.
+- Because Reddit's native post scheduling system is capped at two automated slots, trying to automate stickied posts or events after the limit of 2 has been reached results in bumping off existing stickied posts, requiring moderators to re-sticky posts they still need stickied.
 
 These issues can be quite frustrating for moderators in need of automating more than 2 posts that need to be stickied. Relay App expands your subreddit's prime real estate by leveraging the full 6-post limit of the modern Reddit Community Highlights system.
 
-- Relay App allows you to schedule and automate up to five distinct templates.
+- Relay App allows you to schedule and automate **up to five** distinct templates.
 
-- Scheduled posts can be stickied, locked, or both.
+- Scheduled posts can be stickied, locked, or both, and previously stickied posts can be automatically unstickied, locked, or both.
 
 - Relay App bypasses Reddit's native post scheduler limit of 2 stickied posts, allowing you to automate up to **5 sticked posts**.
 
 - By capping our template system at five slots, Relay App intentionally leaves one permanent manual slot open. This ensures your mod team always has room to manually sticky an emergency announcement, a breaking news thread, or other post without the app accidentally overwriting it.
 
-> **Coming Soon:** **Auto-unsticky for scheduled posts** — Automatically unsticky old posts when new sticky posts go live.
-
 ### Using the Scheduling System
 
-The scheduling system works with the Post Template system to automate subreddit posts. Follow these steps to use it:
+The scheduling system works in conjunction with the **Post Template system** to automate subreddit posts. Follow these steps to use it:
 
 1. **Create Post Templates** – Set up your post templates in the app settings.
 
 2. **Enable Scheduling** – Enable scheduling on the templates you want to schedule and specify their timing (All scheduled posts use UTC time).
 
-3. **Activate Scheduled Posts** – In the Subreddit Moderator Context Menu, select **Apply Scheduled Posts** to apply all enabled schedules.
+3. **Toggle Scheduling Interval** – Toggle **"Repeat Weekly"** or **"Repeat Monthly"** based on your preferred scheduling interval (All scheduled posts use UTC time).
 
-> **Note:** If **"Repeat Weekly?"** is toggled off, posts will not run again unless manually re-applied.
+> **Note:** If weekly or monthly repeat is toggled off, posts will only run once and will not run again unless manually re-applied.
 
-> **Coming Soon:** **Auto-unsticky for scheduled posts** — Automatically unsticky old posts when new sticky posts go live.
+4. **Set Schedule** – Set the **day of the week**, **day of the month**, (if using monthly option), **hour**, and **minute** to set your preferred schedule (All scheduled posts use UTC time).
+
+5. **Toggle Sticky/Lock** – Optionally, you may choose whether or not to stick, lock, or sticky and lock the scheduled post.
+
+6. **Toggle Auto-Unticky/Lock** – Optionally, you may choose whether or not to unsticky, lock, or unsticky and lock the previously stickied post.
+
+  > **Note:** If nothing is chosen here, posts previously stickied automatically by Relay App will remain in the highlights bar and unlocked as new ones come in.
+
+7. **Save Settings** – Save your changes before leaving the Relay App settings page.
+
+8. **Activate Scheduled Posts** – In the Subreddit Moderator Context Menu, select **Apply Scheduled Posts** to apply all enabled schedules.
 
 ---
 
@@ -203,8 +216,11 @@ If you have any feedback/suggestions or need support, visit [r/RelayApp](https:/
 * v0.0.8: Implemented scheduling system, updated ReadMe.
 * v0.0.9: Updated ReadMe
 * v0.0.10: Updated ReadMe and resources links.
-* v0.0.11: Implemented reply notifications for Relay App posts/comments, reconfigured app settings cleaned up dead code, reorganized code.
+* v0.0.11: Added reply notifications for Relay App posts/comments, organized app settings, removed dead code, reorganized code.
 * v0.0.12: Updated ReadMe resource links and main.ts resource links due to changed subreddit for Relay App.
-* v0.0.13: Implemented logic for monthly post scheduling. Updated ReadMe.
+* v0.0.13: Added logic for monthly post scheduling. Updated ReadMe.
+* v0.0.14: Minor ReadMe updates. Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
+* v0.0.15: Updated ReadMe. Added optional auto-unsticky/lock to scheduled sticky posts.
+* v0.0.16: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
 
 Thanks for using **Relay App** — publish faster, safer, and without shared accounts!

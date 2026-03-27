@@ -8,7 +8,7 @@ import {
 } from "@devvit/public-api";
 import { Paragraph } from "@devvit/shared-types/richtext/types.js";
 import {
-  isModerator,
+  isModerator as checkIsMod,
   replacePlaceholders,
   getRecommendedPlaceholdersFromModAction,
   assembleRemovalReason,
@@ -46,7 +46,28 @@ Devvit.addSchedulerJob({
     const sticky = await context.settings.get(`postTemplate${templateNumber}Sticky`) as boolean;
     const lock = await context.settings.get(`postTemplate${templateNumber}Lock`) as boolean;
 
+    // --- TOGGLES FOR POST CLEANUP (UNSTICKY/LOCK PREVIOUS POST) ---
+
+    const autoUnsticky = await context.settings.get(`postTemplate${templateNumber}AutoUnsticky`) as boolean;
+    const autoLock = await context.settings.get(`postTemplate${templateNumber}AutoLock`) as boolean;
+
     if (!title) return;
+
+// --- CLEANUP PREVIOUS POST ---
+
+    const redisKey = `last_post_id_template_${templateNumber}`;
+    const lastPostId = await context.redis.get(redisKey);
+
+    if (lastPostId && (autoUnsticky || autoLock)) {
+      try {
+        const oldPost = await context.reddit.getPostById(lastPostId);
+        if (autoUnsticky) await oldPost.unsticky();
+        if (autoLock) await oldPost.lock();
+        console.log(`Cleaned up previous post ${lastPostId} for Template ${templateNumber}`);
+      } catch (e) {
+        console.log(`Cleanup skipped: Previous post ${lastPostId} not found or already handled.`);
+      }
+    }
 
     const post = await context.reddit.submitPost({
       subredditName: subreddit.name,
@@ -54,7 +75,11 @@ Devvit.addSchedulerJob({
       text: body,
     });
 
-    await post.distinguish(true);
+    // --- SAVE NEW POST ID FOR NEXT RUN'S CLEANUP ---
+    
+    await context.redis.set(redisKey, post.id);
+
+    await post.distinguish();
     if (sticky) await post.sticky();
     if (lock) await post.lock();
 
@@ -71,26 +96,27 @@ Devvit.addSchedulerJob({
 // --- HELPER FUNCTION TO GET MONTHLY CRON EXPRESSION ---
 
     if (monthly) {
-  const nextMonthDate = new Date();
-  nextMonthDate.setUTCMonth(nextMonthDate.getUTCMonth() + 1);
+      const nextMonthDate = new Date();
+      nextMonthDate.setUTCMonth(nextMonthDate.getUTCMonth() + 1);
 
-  const nextCron = getMonthlyCron(monthDay, hour, minute, nextMonthDate);
+      const nextCron = getMonthlyCron(monthDay, hour, minute, nextMonthDate);
 
-  await context.scheduler.runJob({
-    name: 'scheduled_post_job',
-    cron: nextCron,
-    data: { templateNumber },
-  });
+      await context.scheduler.runJob({
+        name: 'scheduled_post_job',
+        cron: nextCron,
+        data: { templateNumber },
+      });
 
-  console.log(`Monthly Template ${templateNumber} rescheduled for next month.`);
-}
+      console.log(`Monthly Template ${templateNumber} rescheduled for next month.`);
+    }
 
     const repeat = await context.settings.get(
       `postTemplate${templateNumber}Repeat`
     ) as boolean;
 
-    if (!repeatWeekly && !monthly && event.job?.id) {
-      await context.scheduler.cancelJob(event.job.id);
+    const scheduledEvent = event as any;
+    if (!repeatWeekly && !monthly && scheduledEvent.job?.id) {
+      await context.scheduler.cancelJob(scheduledEvent.job.id);
     }
   },
 });
@@ -264,7 +290,7 @@ Devvit.addSettings([
           { label: "Saturday", value: "6" },
           { label: "Sunday", value: "0" },
         ],
-        defaultValue: "1",
+        defaultValue: ["1"],
       },
       {
       name: "postTemplate1Monthly",
@@ -305,6 +331,20 @@ Devvit.addSettings([
         type: "boolean",
         label: "Lock the scheduled post?",
         defaultValue: false,
+      },
+      {
+      name: 'postTemplate1AutoUnsticky',
+      type: 'boolean',
+      label: 'Auto-Unsticky the previous post?',
+      helpText: 'When a new post from this template is created, should the previous one be unstickied?',
+      defaultValue: false,
+      },
+      {
+      name: 'postTemplate1AutoLock',
+      type: 'boolean',
+      label: 'Auto-Lock the previous post?',
+      helpText: 'When unstickying the previous post, should it also be locked?',
+      defaultValue: false,
       },
     ],
   },
@@ -364,7 +404,7 @@ Devvit.addSettings([
           { label: "Saturday", value: "6" },
           { label: "Sunday", value: "0" },
         ],
-        defaultValue: "1",
+        defaultValue: ["1"],
       },
       {
       name: "postTemplate2Monthly",
@@ -405,6 +445,20 @@ Devvit.addSettings([
         type: "boolean",
         label: "Lock the scheduled post?",
         defaultValue: false,
+      },
+      {
+      name: 'postTemplate2AutoUnsticky',
+      type: 'boolean',
+      label: 'Auto-Unsticky the previous post?',
+      helpText: 'When a new post from this template is created, should the previous one be unstickied?',
+      defaultValue: false,
+      },
+      {
+      name: 'postTemplate2AutoLock',
+      type: 'boolean',
+      label: 'Auto-Lock the previous post?',
+      helpText: 'When unstickying the previous post, should it also be locked?',
+      defaultValue: false,
       },
     ],
   },
@@ -464,7 +518,7 @@ Devvit.addSettings([
           { label: "Saturday", value: "6" },
           { label: "Sunday", value: "0" },
         ],
-        defaultValue: "1",
+        defaultValue: ["1"],
       },
       {
       name: "postTemplate3Monthly",
@@ -505,6 +559,20 @@ Devvit.addSettings([
         type: "boolean",
         label: "Lock the scheduled post?",
         defaultValue: false,
+      },
+      {
+      name: 'postTemplate3AutoUnsticky',
+      type: 'boolean',
+      label: 'Auto-Unsticky the previous post?',
+      helpText: 'When a new post from this template is created, should the previous one be unstickied?',
+      defaultValue: false,
+      },
+      {
+      name: 'postTemplate3AutoLock',
+      type: 'boolean',
+      label: 'Auto-Lock the previous post?',
+      helpText: 'When unstickying the previous post, should it also be locked?',
+      defaultValue: false,
       },
     ],
   },
@@ -564,7 +632,7 @@ Devvit.addSettings([
           { label: "Saturday", value: "6" },
           { label: "Sunday", value: "0" },
         ],
-        defaultValue: "1",
+        defaultValue: ["1"],
       },
       {
       name: "postTemplate4Monthly",
@@ -605,6 +673,20 @@ Devvit.addSettings([
         type: "boolean",
         label: "Lock the scheduled post?",
         defaultValue: false,
+      },
+      {
+      name: 'postTemplate4AutoUnsticky',
+      type: 'boolean',
+      label: 'Auto-Unsticky the previous post?',
+      helpText: 'When a new post from this template is created, should the previous one be unstickied?',
+      defaultValue: false,
+      },
+      {
+      name: 'postTemplate4AutoLock',
+      type: 'boolean',
+      label: 'Auto-Lock the previous post?',
+      helpText: 'When unstickying the previous post, should it also be locked?',
+      defaultValue: false,
       },
     ],
   },
@@ -664,7 +746,7 @@ Devvit.addSettings([
           { label: "Saturday", value: "6" },
           { label: "Sunday", value: "0" },
         ],
-        defaultValue: "1",
+        defaultValue: ["1"],
       },
       {
       name: "postTemplate5Monthly",
@@ -705,6 +787,20 @@ Devvit.addSettings([
         type: "boolean",
         label: "Lock the scheduled post?",
         defaultValue: false,
+      },
+      {
+      name: 'postTemplate5AutoUnsticky',
+      type: 'boolean',
+      label: 'Auto-Unsticky the previous post?',
+      helpText: 'When a new post from this template is created, should the previous one be unstickied?',
+      defaultValue: false,
+      },
+      {
+      name: 'postTemplate5AutoLock',
+      type: 'boolean',
+      label: 'Auto-Lock the previous post?',
+      helpText: 'When unstickying the previous post, should it also be locked?',
+      defaultValue: false,
       },
     ],
   },
@@ -800,9 +896,9 @@ Devvit.addTrigger({
 
     /* WHAT'S NEW */
     ((firstMsg += `**What's new (highlights):**\n\n\n`),
+      (firstMsg += `- **Auto-Unsticky/lock** — Relay app can now automatically unsticky and lock your previous scheduled posts as new ones go live.\n`),
       (firstMsg += `- **Post Scheduling** — Relay app now supports weekly and monthly post scheduling (with optional **Sticky** and **Lock**).\n`),
       (firstMsg += `- **Relay App reply notifications** — Relay App can now notify you when someone replies to a post/comment created by Relay App.\n`),
-      (firstMsg += `- **Lock Relay App posts/comments** — Functionality has been implemented to allow locking of Relay App posts/comments.\n\n`),
 
     /* REMINDERS */
     ((firstMsg += `**Good to know / reminders:**\n\n\n`),
@@ -818,7 +914,7 @@ Devvit.addTrigger({
     /* CONFIG LINKS */
     ((firstMsg += `**Configure now:** manage templates, scheduling, notifications, and more settings here → [Relay App settings](https://developers.reddit.com/r/${subreddit.name}/apps/relay-app)\n\n\n`),
       /* COMING SOON */
-      (firstMsg += `**Coming soon:** Auto-unsticky for scheduled posts!\n\n`));
+      (firstMsg += `**Coming soon:** Image posting via Relay App!\n\n`));
 
     /* FOOTER */
     ((firstMsg += `[Terms & Conditions](https://www.reddit.com/r/RelayApp/wiki/terms-and-conditions/) | `),
@@ -1225,10 +1321,10 @@ const editForm = Devvit.createForm(
 
     if (lockPost == false) {
       console.log("Unlocking post...");
-      getPost.lock({ locked: false });
+      await getPost.unlock();
     } else {
       console.log("Locking post...");
-      getPost.lock({ locked: true });
+      await getPost.lock();
     }
 
     const reasonRev = event.values.reasonRevision;
@@ -1241,7 +1337,7 @@ const editForm = Devvit.createForm(
       user: appAccount,
       label: "SOLID_CONTRIBUTOR",
       note: `${modEditor} edited mod post, reason: ${reasonRev}`,
-      redditId: originalPost,
+      redditId: `t3_${originalPost}`,
     });
 
     var logMsg = `Title: ${getPost.title}\n\n`;
@@ -1386,9 +1482,9 @@ Devvit.addMenuItem({
         );
         context.ui.showForm(editForm, {
           pTitle: getPost.title,
-          pBody: getPost.body,
-          statusDist: checkDist,
-          statusSticky: checkSt,
+          pBody: getPost.body ?? "",
+          statusDist: checkDist ?? false,
+          statusSticky: checkSt ?? false,
         });
       } else {
         console.log(
@@ -1681,10 +1777,10 @@ const editComment = Devvit.createForm(
 
     if (lockComment == false) {
       console.log("Unlocking comment...");
-      getComment.lock(false);
+      await getComment.unlock();
     } else {
       console.log("Locking comment...");
-      getComment.lock(true);
+      await getComment.lock();
     }
 
     const reasonRev = event.values.reasonRevision;
@@ -1697,7 +1793,7 @@ const editComment = Devvit.createForm(
       user: appAccount,
       label: "SOLID_CONTRIBUTOR",
       note: `${modEditor} edited mod comment, reason: ${reasonRev}`,
-      redditId: originalComment,
+      redditId: `t1_${originalComment}`,
     });
 
     var logMsg = `Comment URL: https://reddit.com${getComment.permalink}\n\n`;

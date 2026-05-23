@@ -20,11 +20,17 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 - **Auto-Flair (optional)** — Apply a chosen post flair after submitting a post, or automatically change post flair after replying to a post.
 - **Permanent Delete** — Posts/comments created via Relay App can be permantently deleted (not just marked as "removed").
 
-> **Coming Soon:** **Image posting** — Post/comment images via Relay App! 
-
 ---
 
 ## What's New?
+
+### Link posting
+
+You can now seamlessly publish native link posts with optional body text directly through Relay App.
+
+### Media posting
+
+You can now seamlessly publish native media posts with optional body text directly through Relay App.
 
 ### Auto-unsticky/lock for scheduled posts
 
@@ -67,6 +73,28 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 2. Start from scratch **or** click **Use template** (see Templates below).
 3. Toggle **Sticky** / **Lock** as needed.
 4. **Publish.**
+   - An **internal mod note** is added automatically (actor + direct link).
+   - A **modmail** message is sent **by default** (on submit and on later edits).
+
+### Publish a mod link post
+
+1. Using the main subreddit menu (on desktop and mobile), open **Relay App → Submit mod link post**.
+2. Enter the post title.
+3. Add the link URL you want to share.
+4. Add optional body text
+5. Toggle **Sticky** / **Lock** as needed.
+6. **Publish.**
+   - An **internal mod note** is added automatically (actor + direct link).
+   - A **modmail** message is sent **by default** (on submit and on later edits).
+
+### Publish a mod media post
+
+1. Using the main subreddit menu (on desktop and mobile), open **Relay App → Submit mod media post**.
+2. Enter the post title.
+3. Add a direct image link (e.g., ending in .jpg or .png) or video link (YouTube, Vimeo).
+4. Add optional body text
+5. Toggle **Sticky** / **Lock** as needed.
+6. **Publish.**
    - An **internal mod note** is added automatically (actor + direct link).
    - A **modmail** message is sent **by default** (on submit and on later edits).
 
@@ -222,5 +250,12 @@ If you have any feedback/suggestions or need support, visit [r/RelayApp](https:/
 * v0.0.14: Minor ReadMe updates. Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
 * v0.0.15: Updated ReadMe. Added optional auto-unsticky/lock to scheduled sticky posts.
 * v0.0.16: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
+* v0.0.17: Added logic for image posting, updated ReadMe.
+* v0.0.18: Added logic for link posting, updated ReadMe.
+* v0.0.19: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
+* v0.0.20: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
+* v0.0.21: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
+* v0.0.22: Bumped file version due to Reddit auto-bumping file version and new Devvit release.
+* v0.0.23: Updated app to latest Devvit release.
 
 Thanks for using **Relay App** — publish faster, safer, and without shared accounts!

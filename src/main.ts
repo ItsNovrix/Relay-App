@@ -844,10 +844,14 @@ Devvit.addTrigger({
     ((firstMsg += `**Features you can use today:**\n\n\n`),
       (firstMsg += `- Publish **official mod posts** (text) with one-click **Distinguish**, **Sticky**, and **Lock**.\n`),
       (firstMsg += `- Publish **official mod comments** (also with **Distinguish**, **Sticky**, and **Lock**).\n`),
+      (firstMsg += `- **Native Link Posting** — Seamlessly publish native link posts with optional body text.\n`),
+      (firstMsg += `- **Native Media Posting** — Seamlessly publish native media posts with optional body text.\n`),
+      (firstMsg += `- **Reply notifications** — Receive notifications to modmail when someone replies to a post/comment created by Relay App or other specified mod apps.\n`),
       (firstMsg += `- **Auto-flair after posting** — Automatically apply a flair (e.g., *Mod Post*) to posts created via Relay App.\n`),
       (firstMsg += `- **Auto-flair after commenting** — When a **mod replies via Relay App**, the post flair can auto-switch (e.g., *Mods Replied*).\n`),
       (firstMsg += `- **Post Templates** — Save up to **5** reusable templates per subreddit. Add them in settings, then select **Use template** when creating a post.\n`),
       (firstMsg += `- **Post Scheduling** — Schedule up to **5** post templates to automatically publish at specific times weekly (with optional **Sticky** and **Lock**).\n`),
+      (firstMsg += `- **Auto-Unsticky/lock** — Automatically unsticky and/or lock your previous scheduled posts as new ones go live.\n`),
       (firstMsg += `- **Clone Post** — Click **Clone** on any previous post to rapidly reuse it (perfect for monthly stickies & AMA re-runs).\n`),
       (firstMsg += `- **Permanent delete** of posts/comments created via the app (not just remove) — use with care.\n`),
       (firstMsg += `- Permissions required: **Post** or **Everything**.\n\n`));
@@ -896,9 +900,7 @@ Devvit.addTrigger({
 
     /* WHAT'S NEW */
     ((firstMsg += `**What's new (highlights):**\n\n\n`),
-      (firstMsg += `- **Auto-Unsticky/lock** — Relay app can now automatically unsticky and lock your previous scheduled posts as new ones go live.\n`),
-      (firstMsg += `- **Post Scheduling** — Relay app now supports weekly and monthly post scheduling (with optional **Sticky** and **Lock**).\n`),
-      (firstMsg += `- **Relay App reply notifications** — Relay App can now notify you when someone replies to a post/comment created by Relay App.\n`),
+      (firstMsg += `- **Devvit Update** — Relay App has been updated to the latest Devvit release for continued functionality and stability.\n`),
 
     /* REMINDERS */
     ((firstMsg += `**Good to know / reminders:**\n\n\n`),
@@ -1220,6 +1222,510 @@ Devvit.addMenuItem({
         `${appUser?.username} has needed permissions (${perms}), ok!`,
       );
       context.ui.showForm(submitForm);
+    } else {
+      console.log(
+        `${appUser?.username} doesn't have Posts permission (${perms}), not ok!`,
+      );
+      return ui.showToast(`You don't have the necessary permissions.`);
+    }
+  },
+});
+
+// --- SUBMIT LINK POST FORM ---
+
+const submitLinkForm = Devvit.createForm(
+  {
+    title: "Submit a link post",
+    fields: [
+      {
+        name: `titleOB`,
+        label: "Post title",
+        type: "string",
+        required: true,
+      },
+      {
+        name: `linkUrl`,
+        label: `Link URL`,
+        type: "string",
+        required: true,
+        helpText: "The web address you want to share.",
+      },
+      {
+        name: `bodyP`,
+        label: "Body Text (Optional)",
+        type: "paragraph",
+        required: false,
+      },
+      {
+        name: `mybDist`,
+        label: `Distinguish?`,
+        type: "boolean",
+        defaultValue: true,
+        helpText:
+          "All content created by the app is distinguished, so users clearly see they come from the mod team.",
+        disabled: true,
+      },
+      {
+        name: `iSticky`,
+        label: `Sticky?`,
+        type: "boolean",
+      },
+      {
+        name: `iLock`,
+        label: `Lock?`,
+        type: "boolean",
+      },
+    ],
+    acceptLabel: "Post Link",
+    description: "Submit a direct link post through Relay App.",
+    cancelLabel: "Cancel",
+  },
+  async (_event, context) => {
+    const { reddit, ui } = context;
+    const subreddit = await reddit.getCurrentSubreddit();
+    const appAccount = await reddit.getAppUser();
+    const currentUser = await reddit.getCurrentUser();
+
+    const distinguishPost = _event.values.mybDist;
+    const stickyPost = _event.values.iSticky;
+    const lockPost = _event.values.iLock;
+
+    const setRelayAppPostFlair = (await context?.settings.get(
+      "setFlairAfterPosting",
+    )) as boolean;
+    const relayAppFlairText = (await context?.settings.get(
+      "relayAppPostFlairText",
+    )) as string;
+
+    const postTitle = _event.values.titleOB;
+    const linkUrl = _event.values.linkUrl;
+    const postBody = _event.values.bodyP; // Capture the body text
+
+    if (!postTitle || !linkUrl) {
+      console.log(`Post missing title or link URL, returning...`);
+      return ui.showToast("Title and link URL are required.");
+    }
+
+    const newPost = await context.reddit.submitPost({
+      subredditName: subreddit.name,
+      title: postTitle,
+      url: linkUrl,
+    });
+    console.log(`Link Post ${newPost.id} created!`);
+
+    if (postBody) {
+        try {
+          await newPost.edit({ text: postBody });
+          console.log(`Ghost edit successful: Body text injected into link post.`);
+        } catch (e) {
+          console.error(`Ghost edit failed for link: ${e}`);
+          const fallbackComment = await newPost.addComment({ text: postBody });
+          await fallbackComment.distinguish();
+        }
+    }
+
+    if (distinguishPost == true) {
+      await newPost.distinguish();
+      console.log(`Post ${newPost.id} distinguished!`);
+    }
+    if (stickyPost == true) {
+      await newPost.sticky();
+      console.log(`Post ${newPost.id} stickied!`);
+    }
+    if (lockPost == true) {
+      await newPost.lock(); 
+      console.log(`Post ${newPost.id} locked!`);
+    }
+
+    if (!setRelayAppPostFlair) {
+      console.log("Auto changing the post flair is disabled, skipping...");
+    } else {
+      console.log("Auto changing the post flair is enabled, okay...");
+      await context.reddit.setPostFlair({
+        subredditName: subreddit.name,
+        postId: newPost.id,
+        text: relayAppFlairText,
+      });
+    }
+
+    await context.reddit.addModNote({
+      subreddit: subreddit.name,
+      user: appAccount.username,
+      label: "SOLID_CONTRIBUTOR",
+      redditId: `t3_${newPost.id}`,
+      note: `${currentUser?.username} created a link mod post (title: ${postTitle}).`,
+    });
+
+    const sendtoModmail = (await context?.settings.get(
+      "sendModmail",
+    )) as boolean;
+    const sendtoDiscord = (await context?.settings.get(
+      "sendDiscord",
+    )) as boolean;
+
+    var logMsg = `**Title**: ${newPost.title}\n\n`;
+    logMsg += `**URL**: https://reddit.com${newPost.permalink}\n\n`;
+    logMsg += `**Moderator**: ${currentUser?.username}\n\n`;
+    logMsg += `**Link**: ${linkUrl}\n\n`;
+    if (postBody) logMsg += `**Post body**: ${postBody}\n\n`;
+
+    ui.showToast("Link Posted!");
+
+    if (sendtoModmail == false) {
+      console.log("Not sending to Modmail, skipping...");
+    } else {
+      await context.reddit.sendPrivateMessageAsSubreddit({
+        fromSubredditName: subreddit.name,
+        to: appAccount.username,
+        subject: `Mod link post submitted`,
+        text: logMsg,
+      });
+    }
+
+    const webhook = (await context?.settings.get("webhookEditor")) as string;
+    if (!webhook) {
+      console.error("No webhook URL provided");
+      return;
+    } else {
+      try {
+        let payload;
+        if (sendtoDiscord == false) {
+          console.log("Not sending to Discord, skipping...");
+        } else {
+          const discordRole = await context.settings.get("discordRole");
+          let discordAlertMessage = discordRole ? `<@&${discordRole}>\n\n` : "";
+
+          if (webhook.startsWith("https://discord.com/api/webhooks/")) {
+            payload = {
+              content: discordAlertMessage,
+              embeds: [
+                {
+                  title: `${postTitle}`,
+                  url: `https://reddit.com${newPost.permalink}`,
+                  fields: [
+                    {
+                      name: "Subreddit",
+                      value: `r/${subreddit.name}`,
+                      inline: true,
+                    },
+                    {
+                      name: "Moderator",
+                      value: `${currentUser?.username}`,
+                      inline: true,
+                    },
+                    {
+                      name: "Link URL",
+                      value: `${linkUrl}`,
+                      inline: false,
+                    },
+                    {
+                        name: "Post body",
+                        value: postBody ? postBody : "*(Link Only)*",
+                        inline: false,
+                    },
+                  ],
+                },
+              ],
+            };
+          }
+        }
+        
+        if (payload) {
+          await fetch(webhook, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          console.log("Alert sent to Discord!");
+        }
+      } catch (err) {
+        console.error(`Error sending alert: ${err}`);
+      }
+    }
+  },
+);
+
+// --- CONTEXT MENU ITEM: SUBMIT MOD LINK POST ---
+
+Devvit.addMenuItem({
+  location: "subreddit",
+  label: "[Relay App] - Submit mod link post",
+  description:
+    "A form for submitting a direct link post through Relay App.",
+  forUserType: "moderator",
+  onPress: async (_event, context) => {
+    const { ui } = context;
+
+    const subreddit = await context.reddit.getCurrentSubreddit();
+    const appUser = await context.reddit.getCurrentUser();
+    const perms = await appUser?.getModPermissionsForSubreddit(subreddit.name);
+
+    if (perms?.includes("posts") || perms?.includes("all")) {
+      console.log(
+        `${appUser?.username} has needed permissions (${perms}), ok!`,
+      );
+      context.ui.showForm(submitLinkForm); 
+    } else {
+      console.log(
+        `${appUser?.username} doesn't have Posts permission (${perms}), not ok!`,
+      );
+      return ui.showToast(`You don't have the necessary permissions.`);
+    }
+  },
+});
+
+// --- SUBMIT MEDIA POST FORM ---
+
+const submitMediaForm = Devvit.createForm(
+  {
+    title: "Submit a media post",
+    fields: [
+      {
+        name: `titleOB`,
+        label: "Post title",
+        type: "string",
+        required: true,
+      },
+      {
+        name: `imageUrl`,
+        label: `Direct Media URL`,
+        type: "string",
+        required: true,
+        helpText: "Supports direct image links (.jpg, .png, etc.) or video links (YouTube, Vimeo).",
+      },
+      {
+        name: `bodyP`,
+        label: "Body Text (Optional)",
+        type: "paragraph",
+        required: false,
+      },
+      {
+        name: `mybDist`,
+        label: `Distinguish?`,
+        type: "boolean",
+        defaultValue: true,
+        helpText:
+          "All content created by the app is distinguished, so users clearly see they come from the mod team.",
+        disabled: true,
+      },
+      {
+        name: `iSticky`,
+        label: `Sticky?`,
+        type: "boolean",
+      },
+      {
+        name: `iLock`,
+        label: `Lock?`,
+        type: "boolean",
+      },
+    ],
+    acceptLabel: "Post Media",
+    description:
+      "Submit a media post through Relay App. Body text will be automatically added.",
+    cancelLabel: "Cancel",
+  },
+  async (_event, context) => {
+    const { reddit, ui } = context;
+    const subreddit = await reddit.getCurrentSubreddit();
+    const appAccount = await reddit.getAppUser();
+    const currentUser = await reddit.getCurrentUser();
+
+    const distinguishPost = _event.values.mybDist;
+    const stickyPost = _event.values.iSticky;
+    const lockPost = _event.values.iLock;
+
+    const setRelayAppPostFlair = (await context?.settings.get(
+      "setFlairAfterPosting",
+    )) as boolean;
+    const relayAppFlairText = (await context?.settings.get(
+      "relayAppPostFlairText",
+    )) as string;
+
+    const postTitle = _event.values.titleOB;
+    const imageUrl = _event.values.imageUrl;
+    const postBody = _event.values.bodyP;
+
+    if (!postTitle || !imageUrl) {
+      console.log(`Post missing title or media URL, returning...`);
+      return ui.showToast("Title and media URL are required.");
+    }
+
+    const newPost = await context.reddit.submitPost({
+      subredditName: subreddit.name,
+      title: postTitle,
+      url: imageUrl,
+    });
+    console.log(`Initial Media Post ${newPost.id} created!`);
+
+    if (postBody) {
+      try {
+        await newPost.edit({ text: postBody });
+        console.log(`Ghost edit successful: Body text injected.`);
+      } catch (e) {
+        console.error(`Ghost edit failed, falling back to comment: ${e}`);
+        const fallbackComment = await newPost.addComment({ text: postBody });
+        await fallbackComment.distinguish();
+        try { await fallbackComment.sticky(); } catch (err) {}
+      }
+    }
+
+    if (distinguishPost == true) {
+      await newPost.distinguish();
+      console.log(`Post ${newPost.id} distinguished!`);
+    }
+    if (stickyPost == true) {
+      await newPost.sticky();
+      console.log(`Post ${newPost.id} stickied!`);
+    }
+    if (lockPost == true) {
+      await newPost.lock(); 
+      console.log(`Post ${newPost.id} locked!`);
+    }
+
+    if (!setRelayAppPostFlair) {
+      console.log("Auto changing the post flair is disabled, skipping...");
+    } else {
+      console.log("Auto changing the post flair is enabled, okay...");
+      await context.reddit.setPostFlair({
+        subredditName: subreddit.name,
+        postId: newPost.id,
+        text: relayAppFlairText,
+      });
+    }
+
+    await context.reddit.addModNote({
+      subreddit: subreddit.name,
+      user: appAccount.username,
+      label: "SOLID_CONTRIBUTOR",
+      redditId: `t3_${newPost.id}`,
+      note: `${currentUser?.username} created a media mod post (title: ${postTitle}).`,
+    });
+    console.log(
+      `Added mod note for post ${newPost.id} by ${currentUser?.username}.`,
+    );
+
+    const sendtoModmail = (await context?.settings.get(
+      "sendModmail",
+    )) as boolean;
+    const sendtoDiscord = (await context?.settings.get(
+      "sendDiscord",
+    )) as boolean;
+
+    var logMsg = `**Title**: ${newPost.title}\n\n`;
+    logMsg += `**URL**: https://reddit.com${newPost.permalink}\n\n`;
+    logMsg += `**Moderator**: ${currentUser?.username}\n\n`;
+    logMsg += `**Media Link**: ${imageUrl}\n\n`;
+    if (postBody) logMsg += `**Post body**: ${postBody}\n\n`;
+
+    ui.showToast("Media Posted!");
+    console.log(
+      `${currentUser?.username} used Relay App to post media ${newPost.url}`,
+    );
+
+    if (sendtoModmail == false) {
+      console.log("Not sending to Modmail, skipping...");
+    } else {
+      await context.reddit.sendPrivateMessageAsSubreddit({
+        fromSubredditName: subreddit.name,
+        to: appAccount.username,
+        subject: `Mod media post submitted`,
+        text: logMsg,
+      });
+      console.log(`Sent to Modmail!`);
+    }
+
+    const webhook = (await context?.settings.get("webhookEditor")) as string;
+    if (!webhook) {
+      console.error("No webhook URL provided");
+      return;
+    } else {
+      try {
+        let payload;
+        if (sendtoDiscord == false) {
+          console.log("Not sending to Discord, skipping...");
+        } else {
+          const discordRole = await context.settings.get("discordRole");
+          let discordAlertMessage;
+          if (discordRole) {
+            discordAlertMessage = `<@&${discordRole}>\n\n`;
+          } else {
+            discordAlertMessage = ``;
+          }
+
+          if (webhook.startsWith("https://discord.com/api/webhooks/")) {
+            console.log("Got Discord webhook, let's go!");
+
+            payload = {
+              content: discordAlertMessage,
+              embeds: [
+                {
+                  title: `${postTitle}`,
+                  url: `https://reddit.com${newPost.permalink}`,
+                  image: { url: imageUrl },
+                  fields: [
+                    {
+                      name: "Subreddit",
+                      value: `r/${subreddit.name}`,
+                      inline: true,
+                    },
+                    {
+                      name: "Moderator",
+                      value: `${currentUser?.username}`,
+                      inline: true,
+                    },
+                    {
+                      name: "Post body",
+                      value: postBody ? postBody : "*(Media Only Post)*",
+                      inline: true,
+                    },
+                  ],
+                },
+              ],
+            };
+          }
+        }
+        try {
+          if (payload) {
+            await fetch(webhook, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            });
+            console.log("Alert sent to Discord!");
+          }
+        } catch (err) {
+          console.error(`Error sending alert: ${err}`);
+        }
+      } catch (err) {
+        console.error(`Error sending alert: ${err}`);
+      }
+    }
+  },
+);
+
+// --- CONTEXT MENU ITEM: SUBMIT MOD MEDIA POST ---
+
+Devvit.addMenuItem({
+  location: "subreddit",
+  label: "[Relay App] - Submit mod media post",
+  description:
+    "A form for submitting a media post through Relay App. Body text will be injected automatically.",
+  forUserType: "moderator",
+  onPress: async (_event, context) => {
+    const { ui } = context;
+
+    const subreddit = await context.reddit.getCurrentSubreddit();
+    const appUser = await context.reddit.getCurrentUser();
+    const botAccount = (await context.reddit.getAppUser()).username;
+    const perms = await appUser?.getModPermissionsForSubreddit(subreddit.name);
+
+    if (perms?.includes("posts") || perms?.includes("all")) {
+      console.log(
+        `${appUser?.username} has needed permissions (${perms}), ok!`,
+      );
+      context.ui.showForm(submitMediaForm); 
     } else {
       console.log(
         `${appUser?.username} doesn't have Posts permission (${perms}), not ok!`,

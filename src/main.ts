@@ -846,7 +846,7 @@ Devvit.addTrigger({
       (firstMsg += `- Publish **official mod comments** (also with **Distinguish**, **Sticky**, and **Lock**).\n`),
       (firstMsg += `- **Native Link Posting** — Seamlessly publish native link posts with optional body text.\n`),
       (firstMsg += `- **Native Media Posting** — Seamlessly publish native media posts with optional body text.\n`),
-      (firstMsg += `- **Reply notifications** — Receive notifications to modmail when someone replies to a post/comment created by Relay App or other specified mod apps.\n`),
+      (firstMsg += `- **Reply notifications** — Modmail notifications for replies to posts/comments made by Relay App or other specified mod apps.\n`),
       (firstMsg += `- **Auto-flair after posting** — Automatically apply a flair (e.g., *Mod Post*) to posts created via Relay App.\n`),
       (firstMsg += `- **Auto-flair after commenting** — When a **mod replies via Relay App**, the post flair can auto-switch (e.g., *Mods Replied*).\n`),
       (firstMsg += `- **Post Templates** — Save up to **5** reusable templates per subreddit. Add them in settings, then select **Use template** when creating a post.\n`),
@@ -876,9 +876,9 @@ Devvit.addTrigger({
     await context.reddit.setUserFlair({
       subredditName: subreddit.name,
       username: appAccount.username,
-      text: "Mod Bot 🤖",
+      text: "Mod Team 🛡️",
       textColor: "light",
-      backgroundColor: "#FF0000",
+      backgroundColor: "#2200ff",
     });
   },
 });
@@ -895,12 +895,15 @@ Devvit.addTrigger({
 
     var firstMsg = `Hello r/${subreddit.name} mods,\n\n`;
 
-    ((firstMsg += `Thanks for **updating Relay App**!\n\n`),
+    ((firstMsg += `Thanks for updating **Relay App**!\n\n`),
       (firstMsg += `Relay App helps your team publish and manage official mod posts and mod comments — fast, consistent, and without shared accounts.\n\n`));
 
     /* WHAT'S NEW */
     ((firstMsg += `**What's new (highlights):**\n\n\n`),
       (firstMsg += `- **Devvit Update** — Relay App has been updated to the latest Devvit release for continued functionality and stability.\n`),
+      (firstMsg += `- **User Flair Update** — Relay App user flair updated to \`Mod Team 🛡️\` to emphasize human involvement and reduce confusion.\n`),
+      (firstMsg += `- **Reply Notifications Fix** — Fixed markdown issue where multi-paragraph reply notifications would break out of quote layout.\n`),
+      (firstMsg += `- **App Status Messages Fix** — Fixed markdown issue affecting app status messages for installing and updating Relay App.\n\n`));
 
     /* REMINDERS */
     ((firstMsg += `**Good to know / reminders:**\n\n\n`),
@@ -911,12 +914,10 @@ Devvit.addTrigger({
       (firstMsg += `- **Publish/edit notifications are OFF by default** on submit and on edit of a mod post.\n`),
       (firstMsg += `- **Discord notifications** are supported (add your webhook in settings). Note: very long bodies may hit Discord’s payload limits.\n\n`),
       (firstMsg += `- You can **permanently delete** posts/comments created by the app (not just remove) — use with care.\n\n`),
-      (firstMsg += `- To use the app, you need **Post** or **Everything** permissions.\n\n`)));
+      (firstMsg += `- To use the app, you need **Post** or **Everything** permissions.\n\n`));
 
     /* CONFIG LINKS */
-    ((firstMsg += `**Configure now:** manage templates, scheduling, notifications, and more settings here → [Relay App settings](https://developers.reddit.com/r/${subreddit.name}/apps/relay-app)\n\n\n`),
-      /* COMING SOON */
-      (firstMsg += `**Coming soon:** Image posting via Relay App!\n\n`));
+    ((firstMsg += `**Configure now:** manage templates, scheduling, notifications, and more settings here → [Relay App settings](https://developers.reddit.com/r/${subreddit.name}/apps/relay-app)\n\n\n`));
 
     /* FOOTER */
     ((firstMsg += `[Terms & Conditions](https://www.reddit.com/r/RelayApp/wiki/terms-and-conditions/) | `),
@@ -926,16 +927,16 @@ Devvit.addTrigger({
     await context.reddit.sendPrivateMessageAsSubreddit({
       fromSubredditName: subreddit.name,
       to: "relay-app",
-      subject: `Relay App: update`,
+      subject: `Relay App: App Update`,
       text: firstMsg,
     });
     console.log(`Message sent to r/${event.subreddit?.name} mods.`);
     await context.reddit.setUserFlair({
       subredditName: subreddit.name,
       username: appAccount.username,
-      text: "Mod Bot 🤖",
+      text: "Mod Team 🛡️",
       textColor: "light",
-      backgroundColor: "#FF0000",
+      backgroundColor: "#2200ff",
     });
   },
 });
@@ -978,13 +979,18 @@ Devvit.addTrigger({
     if (settings.notify_ignore_mods && await isModerator(event.author.name, context)) return;
 
    // Send Modmail notification
+    const quotedBody = event.comment.body
+      .split("\n")
+      .map(line => `> ${line}`)
+      .join("\n");
+
     await context.reddit.modMail.createModInboxConversation({
       subredditId: context.subredditId,
       subject: "Relay App: New Reply Received",
       bodyMarkdown: `u/${event.author.name} has replied to a ${isReplyToPost ? 'post' : 'comment'} by ${parentAuthor}.
 
 **Comment Text:**
-> ${event.comment.body}
+${quotedBody}
 
 [View Reply](https://www.reddit.com${event.comment.permalink})
 
@@ -1207,7 +1213,7 @@ Devvit.addMenuItem({
   location: "subreddit",
   label: "[Relay App] - Submit mod post",
   description:
-    "A form for submitting a post through Relay app. Post can be edited later.",
+    "A form for submitting a post through Relay App. Post can be edited later.",
   forUserType: "moderator",
   onPress: async (_event, context) => {
     const { ui } = context;

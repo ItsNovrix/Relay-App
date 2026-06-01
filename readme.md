@@ -10,12 +10,15 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 
 - **Publish Official Mod Posts** (text only) — With one-click **Sticky** and **Lock** options.
 - **Publish Official Mod Comments** (text only) — With one-click **Sticky** and **Lock** options.
+- **Native Link Posting** — Seamlessly publish native link posts with optional body text.
+- **Native Media Posting** — Seamlessly publish native media posts with optional body text.
 - **Post Templates** — Create up to **5 reusable post templates** that can quickly be deployed as needed.
 - **Post Scheduling** — Use post templates to automate up to **5 posts** with custom times on a weekly or monthly interval.
 - **Automatic Distinguishing** — Clearly identify posts and comments as mod team communications.
 - **Automatic Internal Mod Note** — Shows user who posted/commented via Relay App and links directly to the post/comment.
 - **Audit Trail** — All actions performed using Relay App are logged in the mod log for transparency and a clear audit trail.
-- **Modmail Notifications (default OFF)** — Modmail notifications for submitting/editing posts/comments and replies to Relay App posts/comments.
+- **Modmail Notifications (default OFF)** — Modmail notifications for submitting/editing posts/comments.
+- **Reply notifications (default OFF)** — Modmail notifications for replies to posts/comments made by Relay App or other specified mod apps.
 - **Discord Notifications (optional)** — Receive notifications in a Discord server on submit **and** on edit of a mod post via webhook URL.
 - **Auto-Flair (optional)** — Apply a chosen post flair after submitting a post, or automatically change post flair after replying to a post.
 - **Permanent Delete** — Posts/comments created via Relay App can be permantently deleted (not just marked as "removed").
@@ -24,28 +27,9 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 
 ## What's New?
 
-### Link posting
+### User Flair Update
 
-You can now seamlessly publish native link posts with optional body text directly through Relay App.
-
-### Media posting
-
-You can now seamlessly publish native media posts with optional body text directly through Relay App.
-
-### Auto-unsticky/lock for scheduled posts
-
-Functionality has been implemented to allow Relay App to automatically unsticky and/or lock stickied posts that were previously published and stickied via post scheduling. 
-
-### Monthly post scheduling
-
-Relay App now includes enhanced post scheduling, allowing for scheduling post templates on a weekly or monthly interval.
-
-### Reply notifications
-
-Relay App now includes functionality to notify via modmail when a user replies to a Relay App post or comment.
-
-- Optional toggle to ignore replies from mod accounts.
-- Optional functionality to notify for additional specified users (e.g., AutoModerator and -ModTeam accounts).
+Relay App user flair updated to `Mod Team 🛡️` to emphasize human involvement and reduce confusion.
 
 ---
 
@@ -232,7 +216,15 @@ If you have any feedback/suggestions or need support, visit [r/RelayApp](https:/
 
 ---
 
-## Changelog
+## 🚀 Changelog
+
+**🛡️ Core Releases**
+
+* v1.0.0: Relay App user flair updated, fixed markdown issues with multi-paragraph reply notifications and app status messages.
+* v1.0.1: Corrected formatting issue with README.
+* v1.0.2: Updated app to latest Devvit release.
+
+**📂 Beta Development History**
 
 * v0.0.1: Code forked from original app. App name updated.
 * v0.0.2: Implemented functionality to allow locking of Relay App posts/comments.
@@ -257,5 +249,7 @@ If you have any feedback/suggestions or need support, visit [r/RelayApp](https:/
 * v0.0.21: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
 * v0.0.22: Bumped file version due to Reddit auto-bumping file version and new Devvit release.
 * v0.0.23: Updated app to latest Devvit release.
+* v0.0.24: File version auto-bumped by Devvit.
+* v0.0.25: Corrected issue with .env file.
 
 Thanks for using **Relay App** — publish faster, safer, and without shared accounts!

@@ -223,6 +223,7 @@ If you have any feedback/suggestions or need support, visit [r/RelayApp](https:/
 * v1.0.0: Relay App user flair updated, fixed markdown issues with multi-paragraph reply notifications and app status messages.
 * v1.0.1: Corrected formatting issue with README.
 * v1.0.2: Updated app to latest Devvit release.
+* v1.0.3: Updated app to latest Devvit release.
 
 **📂 Beta Development History**
 

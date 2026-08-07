@@ -1,0 +1,646 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "relay-app",
+  "permissions": {
+    "reddit": true,
+    "redis": true
+  },
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
+  "triggers": {
+    "onAppInstall": "/internal/triggers/on-app-install",
+    "onAppUpgrade": "/internal/triggers/on-app-upgrade",
+    "onCommentCreate": "/internal/triggers/on-comment-create"
+  },
+"scheduler": {
+    "tasks": {
+      "scheduled_post_job": {
+        "endpoint": "/internal/scheduler/scheduled-post-job"
+      }
+    }
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "[Relay App] - Submit mod post",
+        "description": "Submit a post through Relay App.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/submit-mod-post"
+      },
+      {
+        "label": "[Relay App] - Submit mod link post",
+        "description": "Submit a direct link post through Relay App.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/submit-link-post"
+      },
+      {
+        "label": "[Relay App] - Submit mod media post",
+        "description": "Submit a media post through Relay App.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/submit-media-post"
+      },
+      {
+        "label": "[Relay App] - Use template",
+        "description": "Submit a mod post using templates.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/use-template"
+      },
+      {
+        "label": "[Relay App] - Apply Scheduled Posts",
+        "description": "Apply scheduled posts based on saved templates.",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/scheduler/apply"
+      },
+      {
+        "label": "[Relay App] - Edit post",
+        "description": "Edit a post made by Relay App.",
+        "location": "post",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/edit-post"
+      },
+      {
+        "label": "[Relay App] - Clone post",
+        "description": "Clone this post using Relay App.",
+        "location": "post",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/clone-post"
+      },
+      {
+        "label": "[Relay App] - Comment",
+        "description": "Submit a comment through Relay App.",
+        "location": ["post", "comment"],
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/submit-comment"
+      },
+      {
+        "label": "[Relay App] - Edit comment",
+        "description": "Edit a comment made by Relay App.",
+        "location": "comment",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/edit-comment"
+      },
+      {
+        "label": "[Relay App] - Delete content",
+        "description": "Delete a post/comment made by Relay App",
+        "location": ["post", "comment"],
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/delete-content"
+      }
+    ]
+  },
+  "forms": {
+    "submitModPostForm": "/internal/form/submit-mod-post",
+    "submitLinkPostForm": "/internal/form/submit-link-post",
+    "submitMediaPostForm": "/internal/form/submit-media-post",
+    "editPostForm": "/internal/form/edit-post",
+    "submitCommentReplyForm": "/internal/form/submit-comment",
+    "editCommentForm": "/internal/form/edit-comment",
+    "selectTemplateForm": "/internal/form/select-template",
+    "submitTemplateForm": "/internal/form/submit-template"
+  },
+  "marketingAssets": {
+    "icon": "assets/icon.png"
+  },
+    "settings": {
+    "subreddit": {
+      "notify_on_posts": {
+        "type": "boolean",
+        "label": "Post Reply Notifications",
+        "helpText": "Enable to receive Modmail notifications when users reply to posts or comments made via Relay App.",
+        "defaultValue": false
+      },
+      "notify_on_comments": {
+        "type": "boolean",
+        "label": "Comment Reply Notifications",
+        "helpText": "Enable to receive Modmail notifications when users reply to comments made via Relay App.",
+        "defaultValue": false
+      },
+      "notify_on_mod_replies": {
+        "type": "boolean",
+        "label": "Moderator Reply Notifications",
+        "helpText": "Enable to receive Modmail notifications when moderators reply to posts/comments made via Relay App.",
+        "defaultValue": false
+      },
+      "notify_extra_users": {
+        "type": "string",
+        "label": "Additional User Reply Notifications",
+        "helpText": "Optionally specify additional usernames to monitor for replies (e.g., AutoModerator). Add usernames as a comma-separated list without u/. Usernames are not case-sensitive."
+      },
+      "sendModmail": {
+        "type": "boolean",
+        "label": "Send Relay App Notifications to Modmail?",
+        "helpText": "Enable to receive a copy of each Relay App publish and edit in Modmail.",
+        "defaultValue": false
+      },
+      "sendDiscord": {
+        "type": "boolean",
+        "label": "Send Relay App Notifications to Discord?",
+        "helpText": "Enable to receive notifications of each Relay App publish and edit in your Discord server via webhook. Very long posts may be truncated by Discord.",
+        "defaultValue": false
+      },
+      "webhookEditor": {
+        "type": "string",
+        "label": "Discord Webhook URL",
+        "helpText": "Paste your Discord webhook URL (Server Settings → Integrations → Webhooks).",
+        "defaultValue": "https://example.com/"
+      },
+      "discordRole": {
+        "type": "string",
+        "label": "Discord Role ID to Ping",
+        "helpText": "Optionally add a Discord role ID to @mention (enable mention permissions for that role in Discord)."
+      },
+      "setFlairAfterPosting": {
+        "type": "boolean",
+        "label": "Auto-Flair - Posts",
+        "helpText": "Enable to automatically update the post flair after a Relay App post is published.",
+        "defaultValue": false
+      },
+      "relayAppPostFlairText": {
+        "type": "string",
+        "label": "Post Flair to Use",
+        "helpText": "Enter the post flair to apply after a Relay App post is published."
+      },
+      "setFlairAfterCommenting": {
+        "type": "boolean",
+        "label": "Auto-Flair - Comments",
+        "helpText": "Enable to automatically update the post flair after a Relay App comment is published.",
+        "defaultValue": false
+      },
+      "relayAppCommentPostFlairText": {
+        "type": "string",
+        "label": "Post Flair to Use",
+        "helpText": "Enter the post flair to apply after a Relay App comment is published."
+      },
+      "postTemplate1name": {
+        "type": "string",
+        "label": "Template 1 Name",
+        "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
+        "defaultValue": "Template #1"
+      },
+      "postTemplate1title": {
+        "type": "string",
+        "label": "Template 1 Post Title",
+        "helpText": "Post title for Template #1. Note: Post titles can only be edited prior to publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate1body": {
+        "type": "paragraph",
+        "label": "Template 1 Post Body",
+        "helpText": "Body text for Template #1 (markdown supported). Body text can be edited before and after publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate1Enabled": {
+        "type": "boolean",
+        "label": "Post Template 1 Scheduling",
+        "helpText": "Enable to schedule recurring posts using Template #1.",
+        "defaultValue": false
+      },
+      "postTemplate1Repeat": {
+        "type": "boolean",
+        "label": "Repeat Weekly?",
+        "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate1Day": {
+        "type": "select",
+        "label": "Day of the Week",
+        "options": [
+          { "label": "Monday", "value": "1" },
+          { "label": "Tuesday", "value": "2" },
+          { "label": "Wednesday", "value": "3" },
+          { "label": "Thursday", "value": "4" },
+          { "label": "Friday", "value": "5" },
+          { "label": "Saturday", "value": "6" },
+          { "label": "Sunday", "value": "0" }
+        ],
+        "defaultValue": "1"
+      },
+      "postTemplate1Monthly": {
+        "type": "boolean",
+        "label": "Repeat Monthly?",
+        "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate1MonthDay": {
+        "type": "number",
+        "label": "Day of month (1-31)",
+        "helpText": "Day of the month the post should be published. If the month has fewer days than set value, the post will be published on the last day of the month.",
+        "defaultValue": 1
+      },
+      "postTemplate1Hour": {
+        "type": "number",
+        "label": "Hour (0-23) UTC",
+        "helpText": "Use 24-hour format (e.g., 13 = 1 PM, 17 = 5 PM). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate1Minute": {
+        "type": "number",
+        "label": "Minute (0-59) UTC",
+        "helpText": "Minute of the hour (0-59). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate1Sticky": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Sticky",
+        "helpText": "Enable to sticky the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate1Lock": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Lock",
+        "helpText": "Enable to lock the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate1AutoUnsticky": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Unsticky",
+        "helpText": "Enable to unsticky previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate1AutoLock": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Lock",
+        "helpText": "Enable to lock previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate2name": {
+        "type": "string",
+        "label": "Template 2 Name",
+        "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
+        "defaultValue": "Template #2"
+      },
+      "postTemplate2title": {
+        "type": "string",
+        "label": "Template 2 Post Title",
+        "helpText": "Post title for Template #2. Note: Post titles can only be edited prior to publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate2body": {
+        "type": "paragraph",
+        "label": "Template 2 Post Body",
+        "helpText": "Body text for Template #2 (markdown supported). Body text can be edited before and after publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate2Enabled": {
+        "type": "boolean",
+        "label": "Post Template 2 Scheduling",
+        "helpText": "Enable to schedule recurring posts using Template #2.",
+        "defaultValue": false
+      },
+      "postTemplate2Repeat": {
+        "type": "boolean",
+        "label": "Repeat Weekly?",
+        "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate2Day": {
+        "type": "select",
+        "label": "Day of the Week",
+        "options": [
+          { "label": "Monday", "value": "1" },
+          { "label": "Tuesday", "value": "2" },
+          { "label": "Wednesday", "value": "3" },
+          { "label": "Thursday", "value": "4" },
+          { "label": "Friday", "value": "5" },
+          { "label": "Saturday", "value": "6" },
+          { "label": "Sunday", "value": "0" }
+        ],
+        "defaultValue": "1"
+      },
+      "postTemplate2Monthly": {
+        "type": "boolean",
+        "label": "Repeat Monthly?",
+        "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate2MonthDay": {
+        "type": "number",
+        "label": "Day of month (1-31)",
+        "helpText": "Day of the month the post should be published. If the month has fewer days than set value, the post will be published on the last day of the month.",
+        "defaultValue": 1
+      },
+      "postTemplate2Hour": {
+        "type": "number",
+        "label": "Hour (0-23) UTC",
+        "helpText": "Use 24-hour format (e.g., 13 = 1 PM, 17 = 5 PM). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate2Minute": {
+        "type": "number",
+        "label": "Minute (0-59) UTC",
+        "helpText": "Minute of the hour (0-59). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate2Sticky": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Sticky",
+        "helpText": "Enable to sticky the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate2Lock": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Lock",
+        "helpText": "Enable to lock the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate2AutoUnsticky": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Unsticky",
+        "helpText": "Enable to unsticky previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate2AutoLock": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Lock",
+        "helpText": "Enable to lock previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate3name": {
+        "type": "string",
+        "label": "Template 3 Name",
+        "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
+        "defaultValue": "Template #3"
+      },
+      "postTemplate3title": {
+        "type": "string",
+        "label": "Template 3 Post Title",
+        "helpText": "Post title for Template #3. Note: Post titles can only be edited prior to publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate3body": {
+        "type": "paragraph",
+        "label": "Template 3 Post Body",
+        "helpText": "Body text for Template #3 (markdown supported). Body text can be edited before and after publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate3Enabled": {
+        "type": "boolean",
+        "label": "Post Template 3 Scheduling",
+        "helpText": "Enable to schedule recurring posts using Template #3.",
+        "defaultValue": false
+      },
+      "postTemplate3Repeat": {
+        "type": "boolean",
+        "label": "Repeat Weekly?",
+        "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate3Day": {
+        "type": "select",
+        "label": "Day of the Week",
+        "options": [
+          { "label": "Monday", "value": "1" },
+          { "label": "Tuesday", "value": "2" },
+          { "label": "Wednesday", "value": "3" },
+          { "label": "Thursday", "value": "4" },
+          { "label": "Friday", "value": "5" },
+          { "label": "Saturday", "value": "6" },
+          { "label": "Sunday", "value": "0" }
+        ],
+        "defaultValue": "1"
+      },
+      "postTemplate3Monthly": {
+        "type": "boolean",
+        "label": "Repeat Monthly?",
+        "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate3MonthDay": {
+        "type": "number",
+        "label": "Day of month (1-31)",
+        "helpText": "Day of the month the post should be published. If the month has fewer days than set value, the post will be published on the last day of the month.",
+        "defaultValue": 1
+      },
+      "postTemplate3Hour": {
+        "type": "number",
+        "label": "Hour (0-23) UTC",
+        "helpText": "Use 24-hour format (e.g., 13 = 1 PM, 17 = 5 PM). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate3Minute": {
+        "type": "number",
+        "label": "Minute (0-59) UTC",
+        "helpText": "Minute of the hour (0-59). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate3Sticky": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Sticky",
+        "helpText": "Enable to sticky the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate3Lock": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Lock",
+        "helpText": "Enable to lock the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate3AutoUnsticky": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Unsticky",
+        "helpText": "Enable to unsticky previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate3AutoLock": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Lock",
+        "helpText": "Enable to lock previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate4name": {
+        "type": "string",
+        "label": "Template 4 Name",
+        "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
+        "defaultValue": "Template #4"
+      },
+      "postTemplate4title": {
+        "type": "string",
+        "label": "Template 4 Post Title",
+        "helpText": "Post title for Template #4. Note: Post titles can only be edited prior to publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate4body": {
+        "type": "paragraph",
+        "label": "Template 4 Post Body",
+        "helpText": "Body text for Template #4 (markdown supported). Body text can be edited before and after publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate4Enabled": {
+        "type": "boolean",
+        "label": "Post Template 4 Scheduling",
+        "helpText": "Enable to schedule recurring posts using Template #4.",
+        "defaultValue": false
+      },
+      "postTemplate4Repeat": {
+        "type": "boolean",
+        "label": "Repeat Weekly?",
+        "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate4Day": {
+        "type": "select",
+        "label": "Day of the Week",
+        "options": [
+          { "label": "Monday", "value": "1" },
+          { "label": "Tuesday", "value": "2" },
+          { "label": "Wednesday", "value": "3" },
+          { "label": "Thursday", "value": "4" },
+          { "label": "Friday", "value": "5" },
+          { "label": "Saturday", "value": "6" },
+          { "label": "Sunday", "value": "0" }
+        ],
+        "defaultValue": "1"
+      },
+      "postTemplate4Monthly": {
+        "type": "boolean",
+        "label": "Repeat Monthly?",
+        "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate4MonthDay": {
+        "type": "number",
+        "label": "Day of month (1-31)",
+        "helpText": "Day of the month the post should be published. If the month has fewer days than set value, the post will be published on the last day of the month.",
+        "defaultValue": 1
+      },
+      "postTemplate4Hour": {
+        "type": "number",
+        "label": "Hour (0-23) UTC",
+        "helpText": "Use 24-hour format (e.g., 13 = 1 PM, 17 = 5 PM). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate4Minute": {
+        "type": "number",
+        "label": "Minute (0-59) UTC",
+        "helpText": "Minute of the hour (0-59). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate4Sticky": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Sticky",
+        "helpText": "Enable to sticky the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate4Lock": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Lock",
+        "helpText": "Enable to lock the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate4AutoUnsticky": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Unsticky",
+        "helpText": "Enable to unsticky previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate4AutoLock": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Lock",
+        "helpText": "Enable to lock previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate5name": {
+        "type": "string",
+        "label": "Template 5 Name",
+        "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
+        "defaultValue": "Template #5"
+      },
+      "postTemplate5title": {
+        "type": "string",
+        "label": "Template 5 Post Title",
+        "helpText": "Post title for Template #5. Note: Post titles can only be edited prior to publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate5body": {
+        "type": "paragraph",
+        "label": "Template 5 Post Body",
+        "helpText": "Body text for Template #5 (markdown supported). Body text can be edited before and after publishing.",
+        "defaultValue": ""
+      },
+      "postTemplate5Enabled": {
+        "type": "boolean",
+        "label": "Post Template 5 Scheduling",
+        "helpText": "Enable to schedule recurring posts using Template #5.",
+        "defaultValue": false
+      },
+      "postTemplate5Repeat": {
+        "type": "boolean",
+        "label": "Repeat Weekly?",
+        "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate5Day": {
+        "type": "select",
+        "label": "Day of the Week",
+        "options": [
+          { "label": "Monday", "value": "1" },
+          { "label": "Tuesday", "value": "2" },
+          { "label": "Wednesday", "value": "3" },
+          { "label": "Thursday", "value": "4" },
+          { "label": "Friday", "value": "5" },
+          { "label": "Saturday", "value": "6" },
+          { "label": "Sunday", "value": "0" }
+        ],
+        "defaultValue": "1"
+      },
+      "postTemplate5Monthly": {
+        "type": "boolean",
+        "label": "Repeat Monthly?",
+        "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
+        "defaultValue": false
+      },
+      "postTemplate5MonthDay": {
+        "type": "number",
+        "label": "Day of month (1-31)",
+        "helpText": "Day of the month the post should be published. If the month has fewer days than set value, the post will be published on the last day of the month.",
+        "defaultValue": 1
+      },
+      "postTemplate5Hour": {
+        "type": "number",
+        "label": "Hour (0-23) UTC",
+        "helpText": "Use 24-hour format (e.g., 13 = 1 PM, 17 = 5 PM). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate5Minute": {
+        "type": "number",
+        "label": "Minute (0-59) UTC",
+        "helpText": "Minute of the hour (0-59). All schedules follow UTC time.",
+        "defaultValue": 0
+      },
+      "postTemplate5Sticky": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Sticky",
+        "helpText": "Enable to sticky the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate5Lock": {
+        "type": "boolean",
+        "label": "Scheduled Post Auto-Lock",
+        "helpText": "Enable to lock the scheduled post on publish.",
+        "defaultValue": false
+      },
+      "postTemplate5AutoUnsticky": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Unsticky",
+        "helpText": "Enable to unsticky previously published post when a new post from this template is published.",
+        "defaultValue": false
+      },
+      "postTemplate5AutoLock": {
+        "type": "boolean",
+        "label": "Previous Post Auto-Lock",
+        "helpText": "Enable to lock previously published post when a new post from this template is published.",
+        "defaultValue": false
+      }
+    }
+  },
+  "dev": {
+    "subreddit": "NovrixLabs"
+  }
+}

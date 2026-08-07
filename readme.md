@@ -27,9 +27,17 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 
 ## What's New?
 
-### User Flair Update
+### App Icon
 
-Relay App user flair updated to `Mod Team 🛡️` to emphasize human involvement and reduce confusion.
+A new app icon has been added to Relay App.
+
+### Support Subreddit Update
+
+With the sunset of r/RelayApp, resources linking to the old subreddit have been updated to reflect the new support subreddit r/NovrixApps.
+
+### Architecture Migration
+
+Relay App has been migrated off of the deprecated blocks architecture for improved functionality and stability.
 
 ---
 
@@ -196,8 +204,8 @@ Need to refresh a monthly sticky or re-run an AMA post? Use **Clone** to copy an
 
 ## 📚 Resources
 
-- [Terms & Conditions](https://www.reddit.com/r/RelayApp/wiki/terms-and-conditions/)
-- [Privacy Policy](https://www.reddit.com/r/RelayApp/wiki/privacy-policy/)
+- [Terms & Conditions](https://www.reddit.com/r/NovrixApps/wiki/relay-app/terms-and-conditions)
+- [Privacy Policy](https://www.reddit.com/r/NovrixApps/wiki/relay-app/privacy-policy/)
 
 ---
 
@@ -212,7 +220,7 @@ This app was developed in compliance with [Reddit's Developer Terms](https://dev
 
 ## 🆘 Feedback & Support
 
-If you have any feedback/suggestions or need support, visit [r/RelayApp](https://www.reddit.com/r/RelayApp).
+If you have any feedback/suggestions or need support, visit [r/NovrixApps](https://www.reddit.com/r/NovrixApps).
 
 ---
 
@@ -224,6 +232,8 @@ If you have any feedback/suggestions or need support, visit [r/RelayApp](https:/
 * v1.0.1: Corrected formatting issue with README.
 * v1.0.2: Updated app to latest Devvit release.
 * v1.0.3: Updated app to latest Devvit release.
+* v1.0.4: Updated app to latest Devvit release. Reworked app settings page and context menus. Updated support subreddit.
+* v1.0.5: Migrated app off of deprecated architecture. Added app icon.
 
 **📂 Beta Development History**
 

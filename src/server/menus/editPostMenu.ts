@@ -3,6 +3,7 @@ import { reddit } from "@devvit/web/server";
 
 export const handleEditPostMenu = async (c: Context) => {
   const event = await c.req.json();
+  console.log("RAW MENU PAYLOAD:", JSON.stringify(event, null, 2));
   const subreddit = await reddit.getCurrentSubreddit();
   const appUser = await reddit.getCurrentUser();
   const botAccount = await reddit.getAppUser();
@@ -18,12 +19,13 @@ export const handleEditPostMenu = async (c: Context) => {
       return c.json({
         showForm: {
           name: "editPostForm",
-          data: { targetId }, // Pass the post ID to the form submission
+          data: { targetId },
           form: {
             title: "Edit post",
             acceptLabel: "Submit",
             cancelLabel: "Cancel",
             fields: [
+              { name: "targetId", label: "Post ID", type: "string", defaultValue: targetId, disabled: true },
               { name: "nTitle", label: "Post title", type: "string", defaultValue: getPost.title, helpText: "Post title can't be edited.", disabled: true },
               { name: "nBody", label: "Post body", type: "paragraph", defaultValue: getPost.body ?? "", required: true },
               { name: "reasonRevision", label: "Reason", type: "string" },

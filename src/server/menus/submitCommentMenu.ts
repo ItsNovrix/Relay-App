@@ -8,7 +8,6 @@ export const handleSubmitCommentMenu = async (c: Context) => {
   const appUser = await reddit.getCurrentUser();
   const perms = await appUser?.getModPermissionsForSubreddit(subreddit.name);
   
-  // Devvit passes the ID of the post/comment the menu was clicked on inside the event payload
   const targetId = event.targetId || event.post?.id || event.comment?.id;
 
   if (perms?.includes("posts") || perms?.includes("all")) {

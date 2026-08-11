@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { reddit, settings } from "@devvit/web/server";
+import { reddit, settings, scheduler } from "@devvit/web/server";
 
 export const handleAppInstall = async (c: Context) => {
   try {
@@ -69,6 +69,16 @@ export const handleAppInstall = async (c: Context) => {
         textColor: "light",
         backgroundColor: "#2200ff",
       });
+
+      try {
+        await scheduler.runJob({
+          name: 'upgrade_notifier_job',
+          cron: '*/30 * * * *',
+        });
+        console.log("30-minute upgrade checker timer started.");
+      } catch (e) {
+        console.error("Failed to start timer:", e);
+      }
 
     return c.json({ success: true });
   } catch (error) {

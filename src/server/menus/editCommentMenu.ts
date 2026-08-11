@@ -3,6 +3,7 @@ import { reddit } from "@devvit/web/server";
 
 export const handleEditCommentMenu = async (c: Context) => {
   const event = await c.req.json();
+  console.log("RAW MENU PAYLOAD:", JSON.stringify(event, null, 2));
   const subreddit = await reddit.getCurrentSubreddit();
   const appUser = await reddit.getCurrentUser();
   const botAccount = await reddit.getAppUser();
@@ -11,7 +12,6 @@ export const handleEditCommentMenu = async (c: Context) => {
   const rawTargetId = event.targetId || event.comment?.id;
   if (!rawTargetId) return c.json({ showToast: { text: "Error: No comment selected." } });
 
-  // Ensure consistent formatting by stripping and explicitly adding the t1_ prefix
   const cleanId = rawTargetId.replace(/^t1_/, '');
   const getComment = await reddit.getCommentById(`t1_${cleanId}`);
   
@@ -20,12 +20,13 @@ export const handleEditCommentMenu = async (c: Context) => {
       return c.json({
         showForm: {
           name: "editCommentForm",
-          data: { targetId: cleanId }, // Pass the clean ID forward to the form
+          data: { targetId: cleanId },
           form: {
             title: "Edit comment",
             acceptLabel: "Submit",
             cancelLabel: "Cancel",
             fields: [
+              { name: "targetId", label: "Comment ID", type: "string", defaultValue: rawTargetId, disabled: true },
               { name: "nBody", label: "Comment", type: "paragraph", defaultValue: getComment.body, required: true },
               { name: "reasonRevision", label: "Reason", type: "string" },
               { name: "mybDist", label: "Distinguish?", type: "boolean", defaultValue: getComment.isDistinguished(), helpText: "All content created by the app is distinguished...", disabled: true },

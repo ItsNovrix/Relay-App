@@ -9,6 +9,7 @@ import { handleAppUpgrade } from './triggers/upgrade.js';
 import { handleCommentCreate } from './triggers/comment.js';
 
 // --- IMPORT SCHEDULER ---
+import { handleUpgradeCheckJob } from './scheduler/upgradeJob.js';
 import { handleScheduledPostJob } from './scheduler/postJob.js';
 import { handleApplySchedules } from './scheduler/apply.js';
 
@@ -45,6 +46,7 @@ app.post('/internal/triggers/on-app-upgrade', handleAppUpgrade);
 app.post('/internal/triggers/on-comment-create', handleCommentCreate);
 
 // Scheduler
+app.post('/internal/scheduler/upgrade-notifier-job', handleUpgradeCheckJob);
 app.post('/internal/scheduler/scheduled-post-job', handleScheduledPostJob);
 app.post('/internal/scheduler/apply', handleApplySchedules);
 

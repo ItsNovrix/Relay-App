@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { reddit, settings } from "@devvit/web/server";
+import { reddit, settings, scheduler } from "@devvit/web/server";
 
 export const handleAppUpgrade = async (c: Context) => {
   try {
@@ -16,10 +16,11 @@ export const handleAppUpgrade = async (c: Context) => {
 
     /* WHAT'S NEW */
     firstMsg += `**What's new (highlights):**\n\n\n`;
-    firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release for continued functionality and stability.\n`;
+    firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release (0.14.0).\n`;
     firstMsg += `- **Support Subreddit Update** — r/RelayApp has been sunset, support subreddit has been moved to r/NovrixApps.\n`;
-    firstMsg += `- **Relay App Icon** — App icon has been added to Relay App.\n`;
-    firstMsg += `- **App Architecture Update** — Relay App has been moved off of previous deprecated Devvit architecture for improved functionality and stability.\n\n`;
+    firstMsg += `- **App Architecture Update** — Relay App has been moved off of previous deprecated Devvit architecture for improved functionality and stability.\n`;
+    firstMsg += `- **Post/Comment Editing Update** — Resolved an issue with Relay App not editing posts/comments.\n`;
+    firstMsg += `- **App Upgrade Notifier** — Relay App now has an app upgrade notifier to alert mod teams when an upgrade is available for Relay App (this can be toggled off in the app settings).\n\n`;
 
     /* REMINDERS */
     firstMsg += `**Good to know / reminders:**\n\n\n`;
@@ -55,6 +56,16 @@ export const handleAppUpgrade = async (c: Context) => {
         textColor: "light",
         backgroundColor: "#2200ff",
       });
+
+      try {
+        await scheduler.runJob({
+          name: 'upgrade_notifier_job',
+          cron: '*/30 * * * *',
+        });
+        console.log("30-minute upgrade checker timer started.");
+      } catch (e) {
+        console.error("Failed to start timer:", e);
+      }
 
     return c.json({ success: true });
   } catch (error) {

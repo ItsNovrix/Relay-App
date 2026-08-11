@@ -3,11 +3,12 @@ import { reddit, settings } from "@devvit/web/server";
 
 export const handleEditCommentForm = async (c: Context) => {
   const event = await c.req.json();
+  console.log("RAW FORM PAYLOAD:", JSON.stringify(event, null, 2));
   const subreddit = await reddit.getCurrentSubreddit();
   const appAccount = await reddit.getAppUser();
   const currentUser = await reddit.getCurrentUser();
   
-  const rawTargetId = event.data?.targetId || event.targetId;
+  const rawTargetId = event.targetId;
   const cleanId = rawTargetId.replace(/^t1_/, '');
   
   const getComment = await reddit.getCommentById(`t1_${cleanId}`);
@@ -30,7 +31,7 @@ export const handleEditCommentForm = async (c: Context) => {
     user: appAccount!.username,
     label: "SOLID_CONTRIBUTOR",
     note: `${currentUser?.username} edited mod comment, reason: ${reasonRev}`,
-    redditId: `t1_${cleanId}`, // Explicitly defining the prefix exactly like your original code
+    redditId: `t1_${cleanId}`,
   });
 
   const sendtoModmail = (await settings.get("sendModmail")) as boolean;

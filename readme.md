@@ -211,10 +211,10 @@ Need to refresh a monthly sticky or re-run an AMA post? Use **Clone** to copy an
 
 ## 🧾 Source & License
 
-The source code for the Relay App is available on [GitHub](https://github.com/ItsNovrix/relay-app).
+The source code for the Relay App is available on [GitHub](https://github.com/ItsNovrix/Relay-App).
 
 This project is licensed under the [BSD-3-Clause License](https://opensource.org/licenses/BSD-3-Clause).
-This app was developed in compliance with [Reddit's Developer Terms](https://developers.reddit.com/apps/relay-app/developer-settings) and adheres to the guidelines for the Devvit platform.
+This app was developed in compliance with [Reddit's Developer Terms](https://www.redditinc.com/policies/developer-terms) and adheres to the guidelines for the Devvit platform.
 
 ---
 
@@ -226,41 +226,12 @@ If you have any feedback/suggestions or need support, visit [r/NovrixApps](https
 
 ## 🚀 Changelog
 
-**🛡️ Core Releases**
+**Latest Version:** v1.1.0
 
-* v1.0.0: Relay App user flair updated, fixed markdown issues with multi-paragraph reply notifications and app status messages.
-* v1.0.1: Corrected formatting issue with README.
-* v1.0.2: Updated app to latest Devvit release.
-* v1.0.3: Updated app to latest Devvit release.
-* v1.0.4: Updated app to latest Devvit release. Reworked app settings page and context menus. Updated support subreddit.
-* v1.0.5: Migrated app off of deprecated architecture. Added app icon.
+* Added expanded changelog.
+* Updated README.
+* Added toggle option for upgrade notifier.
 
-**📂 Beta Development History**
-
-* v0.0.1: Code forked from original app. App name updated.
-* v0.0.2: Implemented functionality to allow locking of Relay App posts/comments.
-* v0.0.3: Corrected minor errors in post locking code, updated ReadMe. Launched app to public.
-* v0.0.4: Corrected minor errors in ReadMe.
-* v0.0.5: Corrected minor error with Reddit Developer Terms link.
-* v0.0.6: Corrected minor error with resources links.
-* v0.0.7: Additional clean up in ReadMe.
-* v0.0.8: Implemented scheduling system, updated ReadMe.
-* v0.0.9: Updated ReadMe
-* v0.0.10: Updated ReadMe and resources links.
-* v0.0.11: Added reply notifications for Relay App posts/comments, organized app settings, removed dead code, reorganized code.
-* v0.0.12: Updated ReadMe resource links and main.ts resource links due to changed subreddit for Relay App.
-* v0.0.13: Added logic for monthly post scheduling. Updated ReadMe.
-* v0.0.14: Minor ReadMe updates. Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
-* v0.0.15: Updated ReadMe. Added optional auto-unsticky/lock to scheduled sticky posts.
-* v0.0.16: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
-* v0.0.17: Added logic for image posting, updated ReadMe.
-* v0.0.18: Added logic for link posting, updated ReadMe.
-* v0.0.19: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
-* v0.0.20: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
-* v0.0.21: Bumped file version due to Reddit auto-bumping file version on previously uploaded version.
-* v0.0.22: Bumped file version due to Reddit auto-bumping file version and new Devvit release.
-* v0.0.23: Updated app to latest Devvit release.
-* v0.0.24: File version auto-bumped by Devvit.
-* v0.0.25: Corrected issue with .env file.
+For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 
 Thanks for using **Relay App** — publish faster, safer, and without shared accounts!

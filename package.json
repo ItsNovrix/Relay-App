@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "relay-app",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -10,18 +10,22 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@devvit/protos": "0.13.11",
-    "@devvit/public-api": "0.13.11",
-    "@devvit/shared-types": "0.13.11",
-    "@devvit/start": "0.13.11",
-    "devvit": "0.13.11",
+    "@devvit/protos": "0.14.0",
+    "@devvit/public-api": "^0.14.0",
+    "@devvit/shared-types": "0.14.0",
+    "@devvit/start": "0.14.0",
+    "@types/json2md": "^1.5.4",
+    "@types/semver": "^7.8.0",
+    "devvit": "^0.14.0",
     "typescript": "5.8.3",
     "vite": "^8.0.16"
   },
   "dependencies": {
-    "@devvit/web": "0.13.11",
+    "@devvit/web": "^0.14.0",
     "@hono/node-server": "^2.0.4",
     "devvit-helpers": "^0.10.0",
-    "hono": "^4.12.33"
+    "hono": "^4.12.33",
+    "json2md": "^2.0.3",
+    "semver": "^7.8.5"
   }
 }

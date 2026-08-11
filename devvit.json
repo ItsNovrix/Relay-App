@@ -18,6 +18,9 @@
     "tasks": {
       "scheduled_post_job": {
         "endpoint": "/internal/scheduler/scheduled-post-job"
+      },
+      "upgrade_notifier_job": {
+        "endpoint": "/internal/scheduler/upgrade-notifier-job"
       }
     }
   },
@@ -110,6 +113,12 @@
   },
     "settings": {
     "subreddit": {
+      "enable_update_notifications": {
+        "type": "boolean",
+        "label": "Enable Upgrade Notifications",
+        "helpText": "Receive a modmail when a new version of Relay App is available.",
+        "defaultValue": true
+      },
       "notify_on_posts": {
         "type": "boolean",
         "label": "Post Reply Notifications",

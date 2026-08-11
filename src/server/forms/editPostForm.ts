@@ -3,10 +3,11 @@ import { reddit, settings } from "@devvit/web/server";
 
 export const handleEditPostForm = async (c: Context) => {
   const event = await c.req.json();
+  console.log("RAW FORM PAYLOAD:", JSON.stringify(event, null, 2));
   const subreddit = await reddit.getCurrentSubreddit();
   const appAccount = await reddit.getAppUser();
   const currentUser = await reddit.getCurrentUser();
-  const targetId = event.data?.targetId || event.targetId;
+  const targetId = event.targetId;
 
   const getPost = await reddit.getPostById(targetId);
   const oldBody = getPost.body;

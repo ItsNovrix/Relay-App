@@ -226,11 +226,9 @@ If you have any feedback/suggestions or need support, visit [r/NovrixApps](https
 
 ## 🚀 Changelog
 
-**Latest Version:** v1.1.0
+**Latest Version:** v1.1.1
 
-* Added expanded changelog.
-* Updated README.
-* Added toggle option for upgrade notifier.
+* Updated version number due to issue with publishing previous version of the app.
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 

@@ -2,6 +2,12 @@
 
 ---
 
+## v1.1.1
+
+* Updated version number due to issue with publishing previous version of the app.
+
+---
+
 ## v1.1.0
 
 * Added expanded changelog.

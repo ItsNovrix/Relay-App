@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "relay-app",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -21,6 +21,7 @@
     "vite": "^8.0.16"
   },
   "dependencies": {
+    "@devvit/scheduler": "^0.14.5",
     "@devvit/web": "0.14.5",
     "@hono/node-server": "^2.0.4",
     "hono": "^4.12.23",

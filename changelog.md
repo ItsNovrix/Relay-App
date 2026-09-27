@@ -2,6 +2,12 @@
 
 ---
 
+## v1.1.7
+
+* Cleared dependency cache due to app version update failure.
+
+---
+
 ## v1.1.6
 
 * Rebuilt dependencies due to app version update failure.

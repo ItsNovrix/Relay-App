@@ -211,7 +211,7 @@ Need to refresh a monthly sticky or re-run an AMA post? Use **Clone** to copy an
 
 ## 🧾 Source & License
 
-The source code for the Relay App is available on [GitHub](https://github.com/ItsNovrix/Relay-App).
+The source code for Relay App is available on [GitHub](https://github.com/ItsNovrix/Relay-App).
 
 This project is licensed under the [BSD-3-Clause License](https://opensource.org/licenses/BSD-3-Clause).
 This app was developed in compliance with [Reddit's Developer Terms](https://www.redditinc.com/policies/developer-terms) and adheres to the guidelines for the Devvit platform.
@@ -226,9 +226,9 @@ If you have any feedback/suggestions or need support, visit [r/NovrixApps](https
 
 ## 🚀 Changelog
 
-**Latest Version:** v1.1.2
+**Latest Version:** v1.1.5
 
-* Updated app to latest Devvit version.
+* Reupload of Devvit version update due to update error.
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 

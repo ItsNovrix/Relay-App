@@ -10,7 +10,7 @@ interface AppUpdate {
 
 const UPDATE_SUBREDDIT = "novrixapps";
 const UPDATE_WIKI_PAGE = "upgrade-notifier";
-const CURRENT_APP_VERSION = "1.1.1";
+const CURRENT_APP_VERSION = "1.1.5";
 
 export async function getNewVersionInfo(appSlug: string): Promise<AppUpdate | undefined> {
     let wikiPage;

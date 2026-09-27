@@ -2,6 +2,22 @@
 
 ---
 
+## v1.1.5
+
+* Reupload of Devvit version update due to update error.
+
+## v1.1.4
+
+* Updated app to latest Devvit version.
+
+---
+
+## v1.1.3
+
+* Rebuilt apdependencies and configuration from known-working files to resolve installation issues.
+
+---
+
 ## v1.1.2
 
 * Updated app to latest Devvit version.

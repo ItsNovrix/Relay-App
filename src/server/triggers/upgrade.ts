@@ -17,6 +17,7 @@ export const handleAppUpgrade = async (c: Context) => {
     /* WHAT'S NEW */
     firstMsg += `**What's new (highlights):**\n\n\n`;
     firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release (0.14.5).\n`;
+    firstMsg += `- **Dependency Updates** — Rebuilt dependencies due to app version update failure.\n`;
     firstMsg += `- **Emergency Install Fix** — Rebuilt app dependencies and configuration from known-working files to resolve installation issues.\n`;
     firstMsg += `- **Support Subreddit Update** — r/RelayApp has been sunset, support subreddit has been moved to r/NovrixApps.\n`;
     firstMsg += `- **App Upgrade Notifier** — Relay App now has an app upgrade notifier to alert mod teams when an upgrade is available for Relay App (this can be toggled off in the app settings).\n\n`;

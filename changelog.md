@@ -2,6 +2,12 @@
 
 ---
 
+## v1.1.6
+
+* Rebuilt dependencies due to app version update failure.
+
+---
+
 ## v1.1.5
 
 * Reupload of Devvit version update due to update error.

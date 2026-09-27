@@ -226,9 +226,9 @@ If you have any feedback/suggestions or need support, visit [r/NovrixApps](https
 
 ## 🚀 Changelog
 
-**Latest Version:** v1.1.5
+**Latest Version:** v1.1.6
 
-* Reupload of Devvit version update due to update error.
+* Rebuilt dependencies due to app version update failure.
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 

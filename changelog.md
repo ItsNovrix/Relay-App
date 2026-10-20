@@ -2,6 +2,12 @@
 
 ---
 
+## v1.1.8
+
+* Updated app to latest Devvit version.
+
+---
+
 ## v1.1.7
 
 * Cleared dependency cache due to app version update failure.

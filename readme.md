@@ -224,11 +224,15 @@ If you have any feedback/suggestions or need support, visit [r/NovrixApps](https
 
 ---
 
+# 📋 App Development
+
+Track upcoming features, planned updates, and known issues for all my Devvit apps on the [Novrix Labs Trello Board](https://trello.com/b/1TdocvRg/novrix-labs).
+
 ## 🚀 Changelog
 
-**Latest Version:** v1.1.7
+**Latest Version:** v1.1.8
 
-* Cleared dependency cache due to app version update failure.
+* Updated app to latest Devvit version.
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 

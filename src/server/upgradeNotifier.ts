@@ -10,7 +10,7 @@ interface AppUpdate {
 
 const UPDATE_SUBREDDIT = "novrixapps";
 const UPDATE_WIKI_PAGE = "upgrade-notifier";
-const CURRENT_APP_VERSION = "1.1.8";
+const CURRENT_APP_VERSION = "1.1.9";
 
 export async function getNewVersionInfo(appSlug: string): Promise<AppUpdate | undefined> {
     let wikiPage;
@@ -72,21 +72,21 @@ export async function checkForUpdates() {
         await redis.set(redisKey, update.version);
 
         const message: json2md.DataObject[] = [
-            { p: `A new version of **${appSlug}** (v${update.version}) is available to install!` }
+            { p: `A new version of **Relay App** is available to install!` }
         ];
         
         if (update.whatsNewBullets && update.whatsNewBullets.length > 0) {
-            message.push({ p: "**Here's what's new:**" });
+            message.push({ p: `**Here's what's new in v${update.version}:**` });
             message.push({ ul: update.whatsNewBullets });
         }
 
         message.push({ 
-            p: `To install this update, visit the **[${appSlug} Configuration Page](https://developers.reddit.com/r/${subreddit.name}/apps/${appSlug})** for r/${subreddit.name}.` 
+            p: `To install this update, or to disable these notifications, visit the **[Relay App configuration page](https://developers.reddit.com/r/${subreddit.name}/apps/relay-app)** for r/${subreddit.name}.` 
         });
 
         await reddit.modMail.createModNotification({
             subredditId: subreddit.id,
-            subject: `New ${appSlug} Update Available: v${update.version}`,
+            subject: `Relay App Update Available: v${update.version}`,
             bodyMarkdown: json2md(message),
         });
 

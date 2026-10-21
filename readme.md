@@ -224,16 +224,20 @@ If you have any feedback/suggestions or need support, visit [r/NovrixApps](https
 
 ---
 
-# 📋 App Development
+## 📋 App Development
 
 Track upcoming features, planned updates, and known issues for all my Devvit apps on the [Novrix Labs Trello Board](https://trello.com/b/1TdocvRg/novrix-labs).
 
+---
+
 ## 🚀 Changelog
 
-**Latest Version:** v1.1.8
+**Latest Version:** v1.1.9
 
-* Updated app to latest Devvit version.
+* Updated the upgrade notifier to reformat upgrade message and app name errors.
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 
-Thanks for using **Relay App** — publish faster, safer, and without shared accounts!
+---
+
+Thanks for using **Relay App**!

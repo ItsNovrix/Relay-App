@@ -39,7 +39,7 @@ export const handleAppInstall = async (c: Context) => {
     firstMsg += `- **Auto-flair after posting** — Automatically apply a flair (e.g., *Mod Post*) to posts created via Relay App.\n`;
     firstMsg += `- **Auto-flair after commenting** — When a **mod replies via Relay App**, the post flair can auto-switch (e.g., *Mods Replied*).\n`;
     firstMsg += `- **Post Templates** — Save up to **5** reusable templates per subreddit. Add them in settings, then select **Use template** when creating a post.\n`;
-    firstMsg += `- **Post Scheduling** — Schedule up to **5** post templates to automatically publish at specific times weekly (with optional **Sticky** and **Lock**).\n`;
+    firstMsg += `- **Post Scheduling** — Schedule up to **5** posts to publish at specific times with optional daily, weekly, or monthly repeat (with optional **Sticky** and **Lock**).\n`;
     firstMsg += `- **Auto-Unsticky/lock** — Automatically unsticky and/or lock your previous scheduled posts as new ones go live.\n`;
     firstMsg += `- **Clone Post** — Click **Clone** on any previous post to rapidly reuse it (perfect for monthly stickies & AMA re-runs).\n`;
     firstMsg += `- **Permanent delete** of posts/comments created via the app (not just remove) — use with care.\n`;
@@ -63,6 +63,9 @@ export const handleAppInstall = async (c: Context) => {
     });
     console.log(`Message sent to r/${subreddit.name} mods.`);
 
+    const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
+
+    if (enableDefaultFlair) {
       await reddit.setUserFlair({
         subredditName: subreddit.name,
         username: appAccount!.username,
@@ -70,6 +73,7 @@ export const handleAppInstall = async (c: Context) => {
         textColor: "light",
         backgroundColor: "#2200ff",
       });
+    }
 
       try {
         await scheduler.runJob({

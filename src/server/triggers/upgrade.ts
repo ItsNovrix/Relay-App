@@ -16,9 +16,9 @@ export const handleAppUpgrade = async (c: Context) => {
 
     /* WHAT'S NEW */
     firstMsg += `**What's new (highlights):**\n\n\n`;
-    firstMsg += `- **Upgrade Notifier Update** — Updated the upgrade notifier to reformat upgrade message and resolve app name errors.\n`;
-    firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release (0.15.0).\n`;
-    firstMsg += `- **Support Subreddit Update** — r/RelayApp has been sunset, support subreddit has been moved to r/NovrixApps.\n`;
+    firstMsg += `- **App User Flair Update** — Reworked functionality for toggling default Relay App user flair.\n`;
+    firstMsg += `- **Post Scheduling Update** — Added daily post scheduling option.\n`;
+    firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release (0.15.3).\n`;
     firstMsg += `- **App Upgrade Notifier** — Relay App now has an app upgrade notifier to alert mod teams when an upgrade is available for Relay App (this can be toggled off in the app settings).\n\n`;
 
     /* REMINDERS */
@@ -49,6 +49,9 @@ export const handleAppUpgrade = async (c: Context) => {
     });
     console.log(`Message sent to r/${subreddit.name} mods.`);
     
+    const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
+
+    if (enableDefaultFlair) {
       await reddit.setUserFlair({
         subredditName: subreddit.name,
         username: appAccount!.username,
@@ -56,6 +59,7 @@ export const handleAppUpgrade = async (c: Context) => {
         textColor: "light",
         backgroundColor: "#2200ff",
       });
+    }
 
       try {
         await scheduler.runJob({

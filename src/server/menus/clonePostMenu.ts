@@ -14,6 +14,18 @@ export const handleClonePostMenu = async (c: Context) => {
 
   if (perms?.includes("posts") || perms?.includes("all")) {
     const oldPost = await reddit.getPostById(targetId);
+
+    const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
+
+    if (enableDefaultFlair) {
+      await reddit.setUserFlair({
+        subredditName: subreddit.name,
+        username: appAccount!.username, 
+        text: "Mod Team 🛡️",
+        textColor: "light",
+        backgroundColor: "#2200ff",
+      });
+    }
     
     const newPost = await reddit.submitPost({
       subredditName: subreddit.name,

@@ -9,6 +9,7 @@ export const handleScheduledPostJob = async (c: Context) => {
   if (!templateNumber) return c.json({ success: true });
 
   const subreddit = await reddit.getCurrentSubreddit();
+  const appAccount = await reddit.getAppUser();
     
   // --- FETCH TEMPLATE SETTINGS ---
   const title = await settings.get(`postTemplate${templateNumber}title`) as string;
@@ -37,6 +38,18 @@ export const handleScheduledPostJob = async (c: Context) => {
     }
   }
 
+  const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
+
+  if (enableDefaultFlair) {
+    await reddit.setUserFlair({
+      subredditName: subreddit.name,
+      username: appAccount!.username, 
+      text: "Mod Team 🛡️",
+      textColor: "light",
+      backgroundColor: "#2200ff",
+    });
+  }
+
   const post = await reddit.submitPost({
     subredditName: subreddit.name,
     title: title,
@@ -53,7 +66,8 @@ export const handleScheduledPostJob = async (c: Context) => {
   console.log(`Scheduled Template ${templateNumber} posted successfully!`);
 
   // --- RESCHEDULE OR CANCEL JOB ---
-  const repeatWeekly = await settings.get(`postTemplate${templateNumber}Repeat`) as boolean;
+  const daily = await settings.get(`postTemplate${templateNumber}Daily`) as boolean;
+  const weekly = await settings.get(`postTemplate${templateNumber}Weekly`) as boolean;
   const monthly = await settings.get(`postTemplate${templateNumber}Monthly`) as boolean;
   const monthDay = await settings.get(`postTemplate${templateNumber}MonthDay`) as number;
   const hour = await settings.get(`postTemplate${templateNumber}Hour`) as number;
@@ -75,7 +89,7 @@ export const handleScheduledPostJob = async (c: Context) => {
     console.log(`Monthly Template ${templateNumber} rescheduled for next month.`);
   }
 
-  if (!repeatWeekly && !monthly && event.job?.id) {
+  if (!daily && !weekly && !monthly && event.job?.id) {
     await scheduler.cancelJob(event.job.id);
   }
 

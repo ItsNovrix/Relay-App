@@ -21,6 +21,18 @@ export const handleSubmitMediaForm = async (c: Context) => {
     return c.json({ showToast: { text: "Title and media URL are required." } });
   }
 
+  const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
+
+  if (enableDefaultFlair) {
+    await reddit.setUserFlair({
+      subredditName: subreddit.name,
+      username: appAccount!.username, 
+      text: "Mod Team 🛡️",
+      textColor: "light",
+      backgroundColor: "#2200ff",
+    });
+  }
+
   const newPost = await reddit.submitPost({
     subredditName: subreddit.name,
     title: postTitle,

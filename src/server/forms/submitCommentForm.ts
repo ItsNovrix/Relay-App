@@ -22,6 +22,18 @@ export const handleSubmitCommentForm = async (c: Context) => {
     return c.json({ showToast: { text: "Error: Could not identify target for comment." } });
   }
 
+  const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
+
+  if (enableDefaultFlair) {
+    await reddit.setUserFlair({
+      subredditName: subreddit.name,
+      username: appAccount!.username, 
+      text: "Mod Team 🛡️",
+      textColor: "light",
+      backgroundColor: "#2200ff",
+    });
+  }
+
   const newComment = await reddit.submitComment({
     id: originalPostOrCommentId,
     text: `${commentBody}`,

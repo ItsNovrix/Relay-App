@@ -22,6 +22,18 @@ export const handleSubmitPostForm = async (c: Context) => {
     return c.json({ showToast: { text: "Sorry, no title." } });
   }
 
+  const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
+
+  if (enableDefaultFlair) {
+    await reddit.setUserFlair({
+      subredditName: subreddit.name,
+      username: appAccount!.username, 
+      text: "Mod Team 🛡️",
+      textColor: "light",
+      backgroundColor: "#2200ff",
+    });
+  }
+
   const newPost = await reddit.submitPost({
     subredditName: subreddit.name,
     title: postTitle,

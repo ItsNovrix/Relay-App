@@ -1,5 +1,13 @@
 # 🚀 Changelog for Relay App
 
+## v1.2.0
+
+* Reworked functionality for toggling default Relay App user flair.
+* Added daily post scheduling option.
+* Relay App has been updated to the latest Devvit release (0.15.3).
+
+---
+
 ## v1.1.9
 
 * Updated the upgrade notifier to reformat upgrade message and app name errors.

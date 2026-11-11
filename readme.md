@@ -13,7 +13,7 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 - **Native Link Posting** — Seamlessly publish native link posts with optional body text.
 - **Native Media Posting** — Seamlessly publish native media posts with optional body text.
 - **Post Templates** — Create up to **5 reusable post templates** that can quickly be deployed as needed.
-- **Post Scheduling** — Use post templates to automate up to **5 posts** with custom times on a weekly or monthly interval.
+- **Post Scheduling** — Use post templates to automate up to **5 posts** with custom times on a daily, weekly, or monthly interval.
 - **Automatic Distinguishing** — Clearly identify posts and comments as mod team communications.
 - **Automatic Internal Mod Note** — Shows user who posted/commented via Relay App and links directly to the post/comment.
 - **Audit Trail** — All actions performed using Relay App are logged in the mod log for transparency and a clear audit trail.
@@ -22,22 +22,6 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 - **Discord Notifications (optional)** — Receive notifications in a Discord server on submit **and** on edit of a mod post via webhook URL.
 - **Auto-Flair (optional)** — Apply a chosen post flair after submitting a post, or automatically change post flair after replying to a post.
 - **Permanent Delete** — Posts/comments created via Relay App can be permantently deleted (not just marked as "removed").
-
----
-
-## What's New?
-
-### App Icon
-
-A new app icon has been added to Relay App.
-
-### Support Subreddit Update
-
-With the sunset of r/RelayApp, resources linking to the old subreddit have been updated to reflect the new support subreddit r/NovrixApps.
-
-### Architecture Migration
-
-Relay App has been migrated off of the deprecated blocks architecture for improved functionality and stability.
 
 ---
 
@@ -119,7 +103,7 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 - Works with **any language/locale** (great for AMA announcements, rules changes, monthly stickies, etc.).
 - Optional post template features include:
   - Schedule post templates to be submitted ahead of time (once).
-  - Schedule post templates to repeat at **weekly** or **monthly** intervals.
+  - Schedule post templates to repeat at **daily**, **weekly**, or **monthly** intervals.
   - Automatically sticky and/or lock posts upon posting.
   - Automatically unsticky and/or lock previous stickied post templates.
 
@@ -153,9 +137,9 @@ The scheduling system works in conjunction with the **Post Template system** to 
 
 2. **Enable Scheduling** – Enable scheduling on the templates you want to schedule and specify their timing (All scheduled posts use UTC time).
 
-3. **Toggle Scheduling Interval** – Toggle **"Repeat Weekly"** or **"Repeat Monthly"** based on your preferred scheduling interval (All scheduled posts use UTC time).
+3. **Toggle Scheduling Interval** – Toggle **"Repeat Daily"**, **"Repeat Weekly"**, or **"Repeat Monthly"** based on your preferred scheduling interval (All scheduled posts use UTC time).
 
-> **Note:** If weekly or monthly repeat is toggled off, posts will only run once and will not run again unless manually re-applied.
+> **Note:** If daily, weekly, or monthly repeat is toggled off, posts will only run once and will not run again unless manually re-applied.
 
 4. **Set Schedule** – Set the **day of the week**, **day of the month**, (if using monthly option), **hour**, and **minute** to set your preferred schedule (All scheduled posts use UTC time).
 
@@ -232,9 +216,11 @@ Track upcoming features, planned updates, and known issues for all my Devvit app
 
 ## 🚀 Changelog
 
-**Latest Version:** v1.1.9
+**Latest Version:** v1.2.0
 
-* Updated the upgrade notifier to reformat upgrade message and app name errors.
+* Reworked functionality for toggling default Relay App user flair.
+* Added daily post scheduling option.
+* Relay App has been updated to the latest Devvit release (0.15.3).
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 

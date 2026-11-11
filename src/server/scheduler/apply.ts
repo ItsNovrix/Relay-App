@@ -16,7 +16,8 @@ export const handleApplySchedules = async (c: Context) => {
     const enabled = await settings.get(`postTemplate${i}Enabled`) as boolean;
     if (!enabled) continue;
 
-    const weekly = await settings.get(`postTemplate${i}Repeat`) as boolean;
+    const daily = await settings.get(`postTemplate${i}Daily`) as boolean;
+    const weekly = await settings.get(`postTemplate${i}Weekly`) as boolean;
     const weeklyDay = await settings.get(`postTemplate${i}Day`) as string;
     const monthly = await settings.get(`postTemplate${i}Monthly`) as boolean;
     const monthDay = await settings.get(`postTemplate${i}MonthDay`) as number;
@@ -24,11 +25,17 @@ export const handleApplySchedules = async (c: Context) => {
     const minute = await settings.get(`postTemplate${i}Minute`) as number;
 
     // --- DETERMINE CRON EXPRESSION BASED ON SCHEDULE TYPE ---
-    const cron = weekly
-      ? `${minute} ${hour} * * ${weeklyDay}`   // Weekly
-      : monthly
-        ? getMonthlyCron(monthDay, hour, minute)   // Monthly
-        : `${minute} ${hour} * * ${weeklyDay}`;      // One-time on selected day
+    let cron = "";
+    
+    if (daily) {
+      cron = `${minute} ${hour} * * *`;
+    } else if (weekly) {
+      cron = `${minute} ${hour} * * ${weeklyDay}`;
+    } else if (monthly) {
+      cron = getMonthlyCron(monthDay, hour, minute);
+    } else {
+      cron = `${minute} ${hour} * * ${weeklyDay}`;
+    }
 
     // --- SCHEDULE THE JOB ---
     await scheduler.runJob({
@@ -38,7 +45,6 @@ export const handleApplySchedules = async (c: Context) => {
     });
   }
 
-  // --- RESPOND TO MENU CLICK ---
   return c.json({
     showToast: { text: "Scheduled posts updated successfully!", appearance: "success" }
   });

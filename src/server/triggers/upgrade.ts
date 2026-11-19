@@ -16,6 +16,7 @@ export const handleAppUpgrade = async (c: Context) => {
 
     /* WHAT'S NEW */
     firstMsg += `**What's new (highlights):**\n\n\n`;
+    firstMsg += `- **Post Templates Update** — Added link / media post type functionality to post templates.\n`;
     firstMsg += `- **App User Flair Update** — Reworked functionality for toggling default Relay App user flair.\n`;
     firstMsg += `- **Post Scheduling Update** — Added daily post scheduling option.\n`;
     firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release (0.15.3).\n`;

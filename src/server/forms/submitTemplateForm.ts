@@ -7,7 +7,10 @@ export const handleSubmitTemplateForm = async (c: Context) => {
   const appAccount = await reddit.getAppUser();
   const currentUser = await reddit.getCurrentUser();
 
+  const rawType = event.postType || event.values?.postType;
+  const postType = ((Array.isArray(rawType) ? rawType[0] : rawType) as string) || "text";
   const postTitle = event.finalTitle || event.values?.finalTitle;
+  const postUrl = ((event.finalUrl || event.values?.finalUrl) as string || "").trim();
   const postBody = event.finalBody || event.values?.finalBody;
   const stickyPost = event.iSticky || event.values?.iSticky;
   const lockPost = event.iLock || event.values?.iLock;
@@ -16,6 +19,10 @@ export const handleSubmitTemplateForm = async (c: Context) => {
   const relayAppFlairText = (await settings.get("relayAppPostFlairText")) as string;
 
   if (!postTitle) return c.json({ showToast: { text: "Sorry, no title." } });
+
+  if ((postType === "link" || postType === "media") && !postUrl) {
+    return c.json({ showToast: { text: "Link or media URL is required." } });
+  }
 
   const enableDefaultFlair = (await settings.get("enableDefaultFlair")) ?? true;
 
@@ -29,11 +36,33 @@ export const handleSubmitTemplateForm = async (c: Context) => {
     });
   }
 
-  const newPost = await reddit.submitPost({
-    subredditName: subreddit.name,
-    title: postTitle,
-    text: postBody,
-  });
+  let newPost;
+
+  if (postType === "link" || postType === "media") {
+    newPost = await reddit.submitPost({
+      subredditName: subreddit.name,
+      title: postTitle,
+      url: postUrl,
+    });
+
+    if (postBody) {
+      try {
+        await newPost.edit({ text: postBody });
+      } catch (e) {
+        const fallbackComment = await newPost.addComment({ text: postBody });
+        await fallbackComment.distinguish();
+        if (postType === "media") {
+          try { await (fallbackComment as any).sticky(); } catch (err) {}
+        }
+      }
+    }
+  } else {
+    newPost = await reddit.submitPost({
+      subredditName: subreddit.name,
+      title: postTitle,
+      text: postBody,
+    });
+  }
 
   await newPost.distinguish();
   if (stickyPost) await newPost.sticky();
@@ -54,8 +83,6 @@ export const handleSubmitTemplateForm = async (c: Context) => {
     redditId: newPost.id,
     note: `${currentUser?.username} created a mod post via template (title: ${postTitle}).`,
   });
-
-  // (Standard modmail logic goes here)
 
   return c.json({ showToast: { text: "Posted!", appearance: "success" } });
 };

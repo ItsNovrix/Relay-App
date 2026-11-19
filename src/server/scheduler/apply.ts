@@ -14,7 +14,10 @@ export const handleApplySchedules = async (c: Context) => {
   // --- SET UP NEW SCHEDULED JOBS BASED ON SETTINGS ---
   for (const i of [1, 2, 3, 4, 5]) {
     const enabled = await settings.get(`postTemplate${i}Enabled`) as boolean;
-    if (!enabled) continue;
+    if (!enabled) {
+      console.log(`[Apply] Template ${i}: skipped (disabled)`);
+      continue;
+    }
 
     const daily = await settings.get(`postTemplate${i}Daily`) as boolean;
     const weekly = await settings.get(`postTemplate${i}Weekly`) as boolean;
@@ -36,6 +39,8 @@ export const handleApplySchedules = async (c: Context) => {
     } else {
       cron = `${minute} ${hour} * * ${weeklyDay}`;
     }
+
+    console.log(`[Apply] Template ${i}: cron="${cron}" (daily=${daily}, weekly=${weekly}, monthly=${monthly}, day=${JSON.stringify(weeklyDay)})`);
 
     // --- SCHEDULE THE JOB ---
     await scheduler.runJob({

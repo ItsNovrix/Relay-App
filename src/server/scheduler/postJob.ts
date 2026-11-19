@@ -5,6 +5,7 @@ import { getMonthlyCron } from "../utils/helpers.js";
 export const handleScheduledPostJob = async (c: Context) => {
   const event = await c.req.json();
   const { templateNumber } = event.data || {};
+  console.log(`[Scheduler] Woke up for Template ${templateNumber}`);
   
   if (!templateNumber) return c.json({ success: true });
 
@@ -16,12 +17,20 @@ export const handleScheduledPostJob = async (c: Context) => {
   const body = await settings.get(`postTemplate${templateNumber}body`) as string;
   const sticky = await settings.get(`postTemplate${templateNumber}Sticky`) as boolean;
   const lock = await settings.get(`postTemplate${templateNumber}Lock`) as boolean;
+  const rawType = await settings.get(`postTemplate${templateNumber}Type`);
+  const postType = ((Array.isArray(rawType) ? rawType[0] : rawType) as string) || "text";
+  const targetUrl = ((await settings.get(`postTemplate${templateNumber}Url`) as string) || "").trim();
 
   // --- TOGGLES FOR POST CLEANUP (UNSTICKY/LOCK PREVIOUS POST) ---
   const autoUnsticky = await settings.get(`postTemplate${templateNumber}AutoUnsticky`) as boolean;
   const autoLock = await settings.get(`postTemplate${templateNumber}AutoLock`) as boolean;
 
   if (!title) return c.json({ success: true });
+
+  if ((postType === "link" || postType === "media") && !targetUrl) {
+    console.warn(`Scheduled Template ${templateNumber} skipped: Missing URL for ${postType} post.`);
+    return c.json({ success: true });
+  }
 
   // --- CLEANUP PREVIOUS POST ---
   const redisKey = `last_post_id_template_${templateNumber}`;
@@ -50,11 +59,40 @@ export const handleScheduledPostJob = async (c: Context) => {
     });
   }
 
-  const post = await reddit.submitPost({
-    subredditName: subreddit.name,
-    title: title,
-    text: body,
-  });
+  let post;
+
+  console.log(`[Scheduler] Attempting Template ${templateNumber}. Type: ${postType}, URL: ${targetUrl}`);
+
+  try {
+    if (postType === "link" || postType === "media") {
+      post = await reddit.submitPost({
+        subredditName: subreddit.name,
+        title: title,
+        url: targetUrl,
+      });
+
+      if (body) {
+        try {
+          await post.edit({ text: body });
+        } catch (e) {
+          const fallbackComment = await post.addComment({ text: body });
+          await fallbackComment.distinguish();
+          if (postType === "media") {
+            try { await (fallbackComment as any).sticky(); } catch (err) {}
+          }
+        }
+      }
+    } else {
+      post = await reddit.submitPost({
+        subredditName: subreddit.name,
+        title: title,
+        text: body,
+      });
+    }
+  } catch (error) {
+    console.error(`[Scheduler] CRASH on Template ${templateNumber}. API rejected the ${postType} submission:`, error);
+    return c.json({ success: false, error: String(error) });
+  }
 
   // --- SAVE NEW POST ID FOR NEXT RUN'S CLEANUP ---
   await redis.set(redisKey, post.id);

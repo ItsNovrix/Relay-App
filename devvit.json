@@ -218,10 +218,27 @@
               "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
               "defaultValue": "Template 1"
           },
+            "postTemplate1Type": {
+              "type": "select",
+              "label": "Template 1 Post Type",
+              "helpText": "Choose whether this template publishes as a Text, Link, or Media (Image/Video) post.",
+              "options": [
+                { "label": "Text Post", "value": "text" },
+                { "label": "Link Post", "value": "link" },
+                { "label": "Media Post (Image / Video)", "value": "media" }
+              ],
+              "defaultValue": "text"
+          },
             "postTemplate1title": {
               "type": "string",
               "label": "Template 1 Post Title",
               "helpText": "Post title for Template 1. Note: Post titles can only be edited prior to publishing.",
+              "defaultValue": ""
+          },
+            "postTemplate1Url": {
+              "type": "string",
+              "label": "Template 1 Link / Media URL",
+              "helpText": "Required for Link or Media posts. For Media posts, use a direct, publicly accessible image or video URL.",
               "defaultValue": ""
           },
             "postTemplate1body": {
@@ -323,10 +340,27 @@
               "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
               "defaultValue": "Template 2"
           },
+            "postTemplate2Type": {
+              "type": "select",
+              "label": "Template 2 Post Type",
+              "helpText": "Choose whether this template publishes as a Text, Link, or Media (Image/Video) post.",
+              "options": [
+                { "label": "Text Post", "value": "text" },
+                { "label": "Link Post", "value": "link" },
+                { "label": "Media Post (Image / Video)", "value": "media" }
+              ],
+              "defaultValue": "text"
+          },
             "postTemplate2title": {
               "type": "string",
               "label": "Template 2 Post Title",
               "helpText": "Post title for Template 2. Note: Post titles can only be edited prior to publishing.",
+              "defaultValue": ""
+          },
+            "postTemplate2Url": {
+              "type": "string",
+              "label": "Template 2 Link / Media URL",
+              "helpText": "Required for Link or Media posts. For Media posts, use a direct, publicly accessible image or video URL.",
               "defaultValue": ""
           },
             "postTemplate2body": {
@@ -428,10 +462,27 @@
               "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
               "defaultValue": "Template 3"
           },
+            "postTemplate3Type": {
+              "type": "select",
+              "label": "Template 3 Post Type",
+              "helpText": "Choose whether this template publishes as a Text, Link, or Media (Image/Video) post.",
+              "options": [
+                { "label": "Text Post", "value": "text" },
+                { "label": "Link Post", "value": "link" },
+                { "label": "Media Post (Image / Video)", "value": "media" }
+              ],
+              "defaultValue": "text"
+          },
             "postTemplate3title": {
               "type": "string",
               "label": "Template 3 Post Title",
               "helpText": "Post title for Template 3. Note: Post titles can only be edited prior to publishing.",
+              "defaultValue": ""
+          },
+            "postTemplate3Url": {
+              "type": "string",
+              "label": "Template 3 Link / Media URL",
+              "helpText": "Required for Link or Media posts. For Media posts, use a direct, publicly accessible image or video URL.",
               "defaultValue": ""
           },
             "postTemplate3body": {
@@ -533,10 +584,27 @@
               "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
               "defaultValue": "Template 4"
           },
+            "postTemplate4Type": {
+              "type": "select",
+              "label": "Template 4 Post Type",
+              "helpText": "Choose whether this template publishes as a Text, Link, or Media (Image/Video) post.",
+              "options": [
+                { "label": "Text Post", "value": "text" },
+                { "label": "Link Post", "value": "link" },
+                { "label": "Media Post (Image / Video)", "value": "media" }
+              ],
+              "defaultValue": "text"
+          },
             "postTemplate4title": {
               "type": "string",
               "label": "Template 4 Post Title",
               "helpText": "Post title for Template 4. Note: Post titles can only be edited prior to publishing.",
+              "defaultValue": ""
+          },
+            "postTemplate4Url": {
+              "type": "string",
+              "label": "Template 4 Link / Media URL",
+              "helpText": "Required for Link or Media posts. For Media posts, use a direct, publicly accessible image or video URL.",
               "defaultValue": ""
           },
             "postTemplate4body": {
@@ -638,10 +706,27 @@
               "helpText": "Internal name shown only in settings. Not visible to users or in posts.",
               "defaultValue": "Template 5"
           },
+            "postTemplate5Type": {
+              "type": "select",
+              "label": "Template 5 Post Type",
+              "helpText": "Choose whether this template publishes as a Text, Link, or Media (Image/Video) post.",
+              "options": [
+                { "label": "Text Post", "value": "text" },
+                { "label": "Link Post", "value": "link" },
+                { "label": "Media Post (Image / Video)", "value": "media" }
+              ],
+              "defaultValue": "text"
+          },
             "postTemplate5title": {
               "type": "string",
               "label": "Template 5 Post Title",
               "helpText": "Post title for Template 5. Note: Post titles can only be edited prior to publishing.",
+              "defaultValue": ""
+          },
+            "postTemplate5Url": {
+              "type": "string",
+              "label": "Template 5 Link / Media URL",
+              "helpText": "Required for Link or Media posts. For Media posts, use a direct, publicly accessible image or video URL.",
               "defaultValue": ""
           },
             "postTemplate5body": {

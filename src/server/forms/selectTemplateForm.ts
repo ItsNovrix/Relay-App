@@ -12,7 +12,10 @@ export const handleSelectTemplateForm = async (c: Context) => {
   // Extract the number (e.g. "template3" -> "3")
   const tNum = templateSelection[0].replace('template', '');
   
+  const rawType = await settings.get(`postTemplate${tNum}Type`);
+  const postType = ((Array.isArray(rawType) ? rawType[0] : rawType) as string) || "text";
   const tempTitle = (await settings.get(`postTemplate${tNum}title`)) as string;
+  const tempUrl = ((await settings.get(`postTemplate${tNum}Url`) as string) || "").trim();
   const tempBody = (await settings.get(`postTemplate${tNum}body`)) as string;
   const tempName = (await settings.get(`postTemplate${tNum}name`)) as string;
 
@@ -24,7 +27,27 @@ export const handleSelectTemplateForm = async (c: Context) => {
         acceptLabel: "Submit",
         cancelLabel: "Cancel",
         fields: [
+          {
+            name: "postType",
+            label: "Post type",
+            type: "select",
+            options: [
+              { label: "Text Post", value: "text" },
+              { label: "Link Post", value: "link" },
+              { label: "Media Post (Image / Video)", value: "media" }
+            ],
+            defaultValue: [postType]
+          },
           { name: "finalTitle", label: "Post title", type: "string", defaultValue: tempTitle },
+          ...(postType === "link" || postType === "media"
+            ? [{
+                name: "finalUrl",
+                label: postType === "media" ? "Media URL (Image / Video)" : "Link URL",
+                type: "string",
+                defaultValue: tempUrl,
+                required: true
+              }]
+            : []),
           { name: "finalBody", label: "Post body", type: "paragraph", defaultValue: tempBody },
           { name: "mybDist", label: "Distinguish?", type: "boolean", defaultValue: true, disabled: true },
           { name: "iSticky", label: "Sticky?", type: "boolean" },

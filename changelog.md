@@ -1,5 +1,23 @@
 # 🚀 Changelog for Relay App
 
+## v1.2.3
+
+* Added additional console logs to identify issue with media post template scheduling.
+
+---
+
+## v1.2.2
+
+* Added console log to identify issue with media post template scheduling.
+
+---
+
+## v1.2.1
+
+* Added link / media post type functionality to post templates.
+
+---
+
 ## v1.2.0
 
 * Reworked functionality for toggling default Relay App user flair.

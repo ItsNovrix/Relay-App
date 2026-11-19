@@ -216,11 +216,9 @@ Track upcoming features, planned updates, and known issues for all my Devvit app
 
 ## 🚀 Changelog
 
-**Latest Version:** v1.2.0
+**Latest Version:** v1.2.3
 
-* Reworked functionality for toggling default Relay App user flair.
-* Added daily post scheduling option.
-* Relay App has been updated to the latest Devvit release (0.15.3).
+* Added additional console logs to identify issue with media post template scheduling.
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 

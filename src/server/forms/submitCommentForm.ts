@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { reddit, settings } from "@devvit/web/server";
+import { getVariableTimezone, applyDynamicVariables } from "../utils/helpers.js";
 
 export const handleSubmitCommentForm = async (c: Context) => {
   const event = await c.req.json();
@@ -8,7 +9,8 @@ export const handleSubmitCommentForm = async (c: Context) => {
   const appAccount = await reddit.getAppUser();
   const currentUser = await reddit.getCurrentUser();
 
-  const commentBody = event.bodyC || event.values?.bodyC;
+  const timezone = await getVariableTimezone();
+  const commentBody = applyDynamicVariables(event.bodyC || event.values?.bodyC, subreddit, timezone);
   const distinguishComment = event.mybDist || event.values?.mybDist;
   const stickyComment = event.iSticky || event.values?.iSticky;
   const lockComment = event.iLock || event.values?.iLock;

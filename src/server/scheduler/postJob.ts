@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
 import { reddit, redis, settings, scheduler } from "@devvit/web/server";
-import { getMonthlyCron } from "../utils/helpers.js";
+import { getMonthlyCron, getVariableTimezone, applyDynamicVariables } from "../utils/helpers.js";
 
 export const handleScheduledPostJob = async (c: Context) => {
   const event = await c.req.json();
@@ -13,13 +13,15 @@ export const handleScheduledPostJob = async (c: Context) => {
   const appAccount = await reddit.getAppUser();
     
   // --- FETCH TEMPLATE SETTINGS ---
-  const title = await settings.get(`postTemplate${templateNumber}title`) as string;
-  const body = await settings.get(`postTemplate${templateNumber}body`) as string;
+  const timezone = await getVariableTimezone();
+  const title = applyDynamicVariables((await settings.get(`postTemplate${templateNumber}title`)) as string, subreddit, timezone);
+  const body = applyDynamicVariables((await settings.get(`postTemplate${templateNumber}body`)) as string, subreddit, timezone);
   const sticky = await settings.get(`postTemplate${templateNumber}Sticky`) as boolean;
   const lock = await settings.get(`postTemplate${templateNumber}Lock`) as boolean;
   const rawType = await settings.get(`postTemplate${templateNumber}Type`);
   const postType = ((Array.isArray(rawType) ? rawType[0] : rawType) as string) || "text";
   const targetUrl = ((await settings.get(`postTemplate${templateNumber}Url`) as string) || "").trim();
+  const flairId = ((await settings.get(`postTemplate${templateNumber}FlairId`) as string) || "").trim();
 
   // --- TOGGLES FOR POST CLEANUP (UNSTICKY/LOCK PREVIOUS POST) ---
   const autoUnsticky = await settings.get(`postTemplate${templateNumber}AutoUnsticky`) as boolean;
@@ -100,6 +102,18 @@ export const handleScheduledPostJob = async (c: Context) => {
   await post.distinguish();
   if (sticky) await post.sticky();
   if (lock) await post.lock();
+
+  if (flairId) {
+    try {
+      await reddit.setPostFlair({
+        subredditName: subreddit.name,
+        postId: post.id,
+        flairTemplateId: flairId,
+      });
+    } catch (err) {
+      console.warn(`[Scheduler] Could not apply post flair "${flairId}" to Template ${templateNumber}:`, err);
+    }
+  }
 
   console.log(`Scheduled Template ${templateNumber} posted successfully!`);
 

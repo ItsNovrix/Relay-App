@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { reddit, settings } from "@devvit/web/server";
+import { getVariableTimezone, applyDynamicVariables, extractFlairId } from "../utils/helpers.js";
 
 export const handleSubmitMediaForm = async (c: Context) => {
   const event = await c.req.json();
@@ -7,9 +8,11 @@ export const handleSubmitMediaForm = async (c: Context) => {
   const appAccount = await reddit.getAppUser();
   const currentUser = await reddit.getCurrentUser();
 
-  const postTitle = event.titleOB || event.values?.titleOB;
+  const timezone = await getVariableTimezone();
+  const postTitle = applyDynamicVariables(event.titleOB || event.values?.titleOB, subreddit, timezone);
   const imageUrl = event.imageUrl || event.values?.imageUrl;
-  const postBody = event.bodyP || event.values?.bodyP;
+  const postBody = applyDynamicVariables(event.bodyP || event.values?.bodyP, subreddit, timezone);
+  const postFlairId = extractFlairId(event.postFlairId || event.values?.postFlairId);
   const distinguishPost = event.mybDist || event.values?.mybDist;
   const stickyPost = event.iSticky || event.values?.iSticky;
   const lockPost = event.iLock || event.values?.iLock;
@@ -53,7 +56,17 @@ export const handleSubmitMediaForm = async (c: Context) => {
   if (stickyPost) await newPost.sticky();
   if (lockPost) await newPost.lock();
 
-  if (setRelayAppPostFlair) {
+  if (postFlairId) {
+    try {
+      await reddit.setPostFlair({
+        subredditName: subreddit.name,
+        postId: newPost.id,
+        flairTemplateId: postFlairId,
+      });
+    } catch (err) {
+      console.warn(`[Submit Media] Could not apply post flair "${postFlairId}":`, err);
+    }
+  } else if (setRelayAppPostFlair) {
     await reddit.setPostFlair({
       subredditName: subreddit.name,
       postId: newPost.id,

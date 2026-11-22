@@ -28,20 +28,21 @@ export const handleAppInstall = async (c: Context) => {
     firstMsg += `- **Reply notifications only monitor the first 24 hours** after a post/comment is made by Relay App due to Reddit limitations.\n`;
     firstMsg += `- **Publish/edit notifications are OFF by default** on submit and on edit of a mod post.\n`;
     firstMsg += `- **Discord notifications** are supported if you add a webhook in settings. Heads-up: very long posts may hit Discord payload limits.\n\n`;
+    firstMsg += `- **App upgrade notifications are ON by default** but can easily be toggled off in the app settings.\n\n`;
 
     /* FEATURES */
     firstMsg += `**Features you can use today:**\n\n\n`;
-    firstMsg += `- Publish **official mod posts** (text) with one-click **Distinguish**, **Sticky**, and **Lock**.\n`;
-    firstMsg += `- Publish **official mod comments** (also with **Distinguish**, **Sticky**, and **Lock**).\n`;
+    firstMsg += `- Publish **official mod posts** with one-click **Sticky** and **Lock**.\n`;
+    firstMsg += `- Publish **official mod comments** with one-click **Sticky** and **Lock**.\n`;
     firstMsg += `- **Native Link Posting** — Seamlessly publish native link posts with optional body text.\n`;
     firstMsg += `- **Native Media Posting** — Seamlessly publish native media posts with optional body text.\n`;
     firstMsg += `- **Reply notifications** — Modmail notifications for replies to posts/comments made by Relay App or other specified mod apps.\n`;
     firstMsg += `- **Auto-flair after posting** — Automatically apply a flair (e.g., *Mod Post*) to posts created via Relay App.\n`;
     firstMsg += `- **Auto-flair after commenting** — When a **mod replies via Relay App**, the post flair can auto-switch (e.g., *Mods Replied*).\n`;
-    firstMsg += `- **Post Templates** — Save up to **5** reusable templates per subreddit. Add them in settings, then select **Use template** when creating a post.\n`;
-    firstMsg += `- **Post Scheduling** — Schedule up to **5** posts to publish at specific times with optional daily, weekly, or monthly repeat (with optional **Sticky** and **Lock**).\n`;
+    firstMsg += `- **Post Templates** — Create up to **5 reusable post templates** that can quickly be deployed as needed. Add them in settings, then select **Use template** when creating a post.\n`;
+    firstMsg += `- **Post Scheduling** — Schedule up to **5 posts** (text, link, or media) with custom times on a daily, weekly, or monthly interval.\n`;
     firstMsg += `- **Auto-Unsticky/lock** — Automatically unsticky and/or lock your previous scheduled posts as new ones go live.\n`;
-    firstMsg += `- **Clone Post** — Click **Clone** on any previous post to rapidly reuse it (perfect for monthly stickies & AMA re-runs).\n`;
+    firstMsg += `- **Clone Post** — Click **Clone** on any previous post to rapidly reuse it.\n`;
     firstMsg += `- **Permanent delete** of posts/comments created via the app (not just remove) — use with care.\n`;
     firstMsg += `- Permissions required: **Post** or **Everything**.\n\n`;
 

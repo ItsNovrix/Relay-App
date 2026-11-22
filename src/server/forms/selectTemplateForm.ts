@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { settings } from "@devvit/web/server";
+import { getPostFlairOptions } from "../utils/helpers.js";
 
 export const handleSelectTemplateForm = async (c: Context) => {
   const event = await c.req.json();
@@ -9,7 +10,6 @@ export const handleSelectTemplateForm = async (c: Context) => {
     return c.json({ showToast: { text: "You must select a template." } });
   }
 
-  // Extract the number (e.g. "template3" -> "3")
   const tNum = templateSelection[0].replace('template', '');
   
   const rawType = await settings.get(`postTemplate${tNum}Type`);
@@ -18,6 +18,10 @@ export const handleSelectTemplateForm = async (c: Context) => {
   const tempUrl = ((await settings.get(`postTemplate${tNum}Url`) as string) || "").trim();
   const tempBody = (await settings.get(`postTemplate${tNum}body`)) as string;
   const tempName = (await settings.get(`postTemplate${tNum}name`)) as string;
+  const tempFlairId = ((await settings.get(`postTemplate${tNum}FlairId`) as string) || "").trim();
+  const flairOptions = await getPostFlairOptions();
+  const hasValidSavedFlair = Boolean(tempFlairId && flairOptions.some((opt) => opt.value === tempFlairId));
+  const defaultFlair = hasValidSavedFlair ? tempFlairId : "none";
 
   return c.json({
     showForm: {
@@ -49,6 +53,9 @@ export const handleSelectTemplateForm = async (c: Context) => {
               }]
             : []),
           { name: "finalBody", label: "Post body", type: "paragraph", defaultValue: tempBody },
+          ...(flairOptions.length > 0
+            ? [{ name: "finalFlairId", label: "Post Flair (optional)", type: "select", options: flairOptions, defaultValue: [defaultFlair] }]
+            : []),
           { name: "mybDist", label: "Distinguish?", type: "boolean", defaultValue: true, disabled: true },
           { name: "iSticky", label: "Sticky?", type: "boolean" },
           { name: "iLock", label: "Lock?", type: "boolean" }

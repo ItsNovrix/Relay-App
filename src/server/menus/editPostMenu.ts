@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { reddit } from "@devvit/web/server";
+import { getPostFlairOptions } from "../utils/helpers.js";
 
 export const handleEditPostMenu = async (c: Context) => {
   const event = await c.req.json();
@@ -16,6 +17,13 @@ export const handleEditPostMenu = async (c: Context) => {
   
   if (getPost.authorName === botAccount!.username) {
     if (perms?.includes("posts") || perms?.includes("all")) {
+      const currentFlairText = getPost.flair?.text?.trim() || "";
+      const liveFlairs = (await getPostFlairOptions(subreddit.name)).filter((opt) => opt.value !== "none");
+      const editFlairOptions = [
+        { label: currentFlairText ? `Keep Current (${currentFlairText})` : "Keep Current (None)", value: "keep" },
+        ...(currentFlairText ? [{ label: "Remove Flair", value: "remove" }] : []),
+        ...liveFlairs,
+      ];
       return c.json({
         showForm: {
           name: "editPostForm",
@@ -28,6 +36,9 @@ export const handleEditPostMenu = async (c: Context) => {
               { name: "targetId", label: "Post ID", type: "string", defaultValue: targetId, disabled: true },
               { name: "nTitle", label: "Post title", type: "string", defaultValue: getPost.title, helpText: "Post title can't be edited.", disabled: true },
               { name: "nBody", label: "Post body", type: "paragraph", defaultValue: getPost.body ?? "", required: true },
+              ...(editFlairOptions.length > 1
+                ? [{ name: "postFlairId", label: "Post Flair (optional)", type: "select", options: editFlairOptions, defaultValue: ["keep"] }]
+                : []),
               { name: "reasonRevision", label: "Reason", type: "string" },
               { name: "mybDist", label: "Distinguish?", type: "boolean", defaultValue: getPost.isDistinguishedBy() ? true : false, helpText: "All content created by the app is distinguished...", disabled: true },
               { name: "iSticky", label: "Sticky?", type: "boolean", defaultValue: getPost.isStickied() },

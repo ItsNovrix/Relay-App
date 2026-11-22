@@ -119,6 +119,25 @@
             "helpText": "Disable to allow Relay App to use whatever custom user flair you manually assign it in your subreddit tools.",
             "defaultValue": true
           },
+        "variableTimezone": {
+            "type": "select",
+            "label": "Dynamic Variable Timezone",
+            "helpText": "Timezone used when formatting date variables like {date} and {weekday}. Does not affect scheduled post UTC times.",
+            "options": [
+              { "label": "UTC (Default)", "value": "UTC" },
+              { "label": "US Eastern (New York)", "value": "America/New_York" },
+              { "label": "US Central (Chicago)", "value": "America/Chicago" },
+              { "label": "US Mountain (Denver)", "value": "America/Denver" },
+              { "label": "US Pacific (Los Angeles)", "value": "America/Los_Angeles" },
+              { "label": "US Alaska (Anchorage)", "value": "America/Anchorage" },
+              { "label": "US Hawaii (Honolulu)", "value": "Pacific/Honolulu" },
+              { "label": "UK / Ireland (London)", "value": "Europe/London" },
+              { "label": "Central Europe (Berlin / Paris)", "value": "Europe/Berlin" },
+              { "label": "Australia Eastern (Sydney)", "value": "Australia/Sydney" },
+              { "label": "Japan (Tokyo)", "value": "Asia/Tokyo" }
+            ],
+            "defaultValue": "UTC"
+          },
         "notification-settings": {
           "type": "group",
           "label": "Notifications",
@@ -235,6 +254,12 @@
               "helpText": "Post title for Template 1. Note: Post titles can only be edited prior to publishing.",
               "defaultValue": ""
           },
+            "postTemplate1FlairId": {
+              "type": "string",
+              "label": "Template 1 Post Flair ID",
+              "helpText": "Optional. Paste a Post Flair ID (Mod Tools → Look and Feel → Post Flair → Copy ID) to automatically apply that flair on publish.",
+              "defaultValue": ""
+          },
             "postTemplate1Url": {
               "type": "string",
               "label": "Template 1 Link / Media URL",
@@ -265,7 +290,7 @@
               "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
               "defaultValue": false
           },
-          "postTemplate1Monthly": {
+            "postTemplate1Monthly": {
               "type": "boolean",
               "label": "Repeat Monthly?",
               "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
@@ -357,6 +382,12 @@
               "helpText": "Post title for Template 2. Note: Post titles can only be edited prior to publishing.",
               "defaultValue": ""
           },
+            "postTemplate2FlairId": {
+              "type": "string",
+              "label": "Template 2 Post Flair ID",
+              "helpText": "Optional. Paste a Post Flair ID (Mod Tools → Look and Feel → Post Flair → Copy ID) to automatically apply that flair on publish.",
+              "defaultValue": ""
+          },
             "postTemplate2Url": {
               "type": "string",
               "label": "Template 2 Link / Media URL",
@@ -387,7 +418,7 @@
               "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
               "defaultValue": false
           },
-          "postTemplate2Monthly": {
+            "postTemplate2Monthly": {
               "type": "boolean",
               "label": "Repeat Monthly?",
               "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
@@ -479,6 +510,12 @@
               "helpText": "Post title for Template 3. Note: Post titles can only be edited prior to publishing.",
               "defaultValue": ""
           },
+            "postTemplate3FlairId": {
+              "type": "string",
+              "label": "Template 3 Post Flair ID",
+              "helpText": "Optional. Paste a Post Flair ID (Mod Tools → Look and Feel → Post Flair → Copy ID) to automatically apply that flair on publish.",
+              "defaultValue": ""
+          },
             "postTemplate3Url": {
               "type": "string",
               "label": "Template 3 Link / Media URL",
@@ -509,7 +546,7 @@
               "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
               "defaultValue": false
           },
-          "postTemplate3Monthly": {
+            "postTemplate3Monthly": {
               "type": "boolean",
               "label": "Repeat Monthly?",
               "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
@@ -601,6 +638,12 @@
               "helpText": "Post title for Template 4. Note: Post titles can only be edited prior to publishing.",
               "defaultValue": ""
           },
+            "postTemplate4FlairId": {
+              "type": "string",
+              "label": "Template 4 Post Flair ID",
+              "helpText": "Optional. Paste a Post Flair ID (Mod Tools → Look and Feel → Post Flair → Copy ID) to automatically apply that flair on publish.",
+              "defaultValue": ""
+          },
             "postTemplate4Url": {
               "type": "string",
               "label": "Template 4 Link / Media URL",
@@ -631,7 +674,7 @@
               "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
               "defaultValue": false
           },
-          "postTemplate4Monthly": {
+            "postTemplate4Monthly": {
               "type": "boolean",
               "label": "Repeat Monthly?",
               "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",
@@ -723,6 +766,12 @@
               "helpText": "Post title for Template 5. Note: Post titles can only be edited prior to publishing.",
               "defaultValue": ""
           },
+            "postTemplate5FlairId": {
+              "type": "string",
+              "label": "Template 5 Post Flair ID",
+              "helpText": "Optional. Paste a Post Flair ID (Mod Tools → Look and Feel → Post Flair → Copy ID) to automatically apply that flair on publish.",
+              "defaultValue": ""
+          },
             "postTemplate5Url": {
               "type": "string",
               "label": "Template 5 Link / Media URL",
@@ -753,7 +802,7 @@
               "helpText": "Enable to schedule post weekly. If OFF, this will only post once at the next scheduled time.",
               "defaultValue": false
           },
-          "postTemplate5Monthly": {
+            "postTemplate5Monthly": {
               "type": "boolean",
               "label": "Repeat Monthly?",
               "helpText": "Enable to schedule post monthly. If OFF, this will only post once at the next scheduled time.",

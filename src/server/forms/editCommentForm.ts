@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { reddit, settings } from "@devvit/web/server";
+import { getVariableTimezone, applyDynamicVariables } from "../utils/helpers.js";
 
 export const handleEditCommentForm = async (c: Context) => {
   const event = await c.req.json();
@@ -14,7 +15,8 @@ export const handleEditCommentForm = async (c: Context) => {
   const getComment = await reddit.getCommentById(`t1_${cleanId}`);
   const oldBody = getComment.body;
   
-  const newCommentText = event.nBody || event.values?.nBody;
+  const timezone = await getVariableTimezone();
+  const newCommentText = applyDynamicVariables(event.nBody || event.values?.nBody, subreddit, timezone);
   const reasonRev = event.reasonRevision || event.values?.reasonRevision || "No reason provided";
   const distinguishComment = event.mybDist ?? event.values?.mybDist;
   const stickyComment = event.iSticky ?? event.values?.iSticky;

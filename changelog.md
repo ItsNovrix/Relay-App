@@ -1,5 +1,14 @@
 # 🚀 Changelog for Relay App
 
+## v1.2.4
+
+* Added post flair selection for manual posting and post templates.
+* Added dynamic variable support for manual posting and post templates.
+* Added fix to upgrade notifier for accidental spaces.
+* Updated app to latest Devvit version (0.15.4).
+
+---
+
 ## v1.2.3
 
 * Added additional console logs to identify issue with media post template scheduling.

@@ -13,13 +13,14 @@ Do you moderate a subreddit where the team regularly needs to publish official a
 - **Native Link Posting** — Seamlessly publish native link posts with optional body text.
 - **Native Media Posting** — Seamlessly publish native media posts with optional body text.
 - **Post Templates** — Create up to **5 reusable post templates** that can quickly be deployed as needed.
-- **Post Scheduling** — Use post templates to automate up to **5 posts** with custom times on a daily, weekly, or monthly interval.
+- **Post Scheduling** — Use post templates to automate up to **5 posts** (text, link, or media) with custom times on a daily, weekly, or monthly interval.
 - **Automatic Distinguishing** — Clearly identify posts and comments as mod team communications.
 - **Automatic Internal Mod Note** — Shows user who posted/commented via Relay App and links directly to the post/comment.
 - **Audit Trail** — All actions performed using Relay App are logged in the mod log for transparency and a clear audit trail.
 - **Modmail Notifications (default OFF)** — Modmail notifications for submitting/editing posts/comments.
 - **Reply notifications (default OFF)** — Modmail notifications for replies to posts/comments made by Relay App or other specified mod apps.
 - **Discord Notifications (optional)** — Receive notifications in a Discord server on submit **and** on edit of a mod post via webhook URL.
+- **Post Flair Selection (optional)** — Choose from your subreddit's post flairs when submitting/editing a mod post, or pre-assign a post flair ID to post templates.
 - **Auto-Flair (optional)** — Apply a chosen post flair after submitting a post, or automatically change post flair after replying to a post.
 - **Permanent Delete** — Posts/comments created via Relay App can be permantently deleted (not just marked as "removed").
 
@@ -47,8 +48,9 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 
 1. Using the main subreddit menu (on desktop and mobile), open **Relay App → New Post**.
 2. Start from scratch **or** click **Use template** (see Templates below).
-3. Toggle **Sticky** / **Lock** as needed.
-4. **Publish.**
+3. Optionally select a **Post Flair** from your subreddit's live flair list.
+4. Toggle **Sticky** / **Lock** as needed.
+5. **Publish.**
    - An **internal mod note** is added automatically (actor + direct link).
    - A **modmail** message is sent **by default** (on submit and on later edits).
 
@@ -58,8 +60,9 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 2. Enter the post title.
 3. Add the link URL you want to share.
 4. Add optional body text
-5. Toggle **Sticky** / **Lock** as needed.
-6. **Publish.**
+5. Optionally select a **Post Flair** from your subreddit's live flair list.
+6. Toggle **Sticky** / **Lock** as needed.
+7. **Publish.**
    - An **internal mod note** is added automatically (actor + direct link).
    - A **modmail** message is sent **by default** (on submit and on later edits).
 
@@ -69,8 +72,9 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 2. Enter the post title.
 3. Add a direct image link (e.g., ending in .jpg or .png) or video link (YouTube, Vimeo).
 4. Add optional body text
-5. Toggle **Sticky** / **Lock** as needed.
-6. **Publish.**
+5. Optionally select a **Post Flair** from your subreddit's live flair list.
+6. Toggle **Sticky** / **Lock** as needed.
+7. **Publish.**
    - An **internal mod note** is added automatically (actor + direct link).
    - A **modmail** message is sent **by default** (on submit and on later edits).
 
@@ -98,10 +102,12 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 
 - Add/edit post templates in app settings:
   `https://developers.reddit.com/r/YOUR_SUBREDDIT/apps/relay-app`
-- You can store **up to 5** templates per subreddit.
-- In the Relay App menu choose **Use template** to prefill **Title** and **Body**; you can still edit before publishing.
+- You can store **up to 5** templates per subreddit, supporting **Text**, **Link**, and **Media (Image/Video)** post types.
+- In the Relay App menu choose **Use template** to prefill **Post Type**, **Title**, **Link/Media URL**, **Body**, and **Post Flair**. This can be edited before publishing.
 - Works with **any language/locale** (great for AMA announcements, rules changes, monthly stickies, etc.).
 - Optional post template features include:
+  - Choose between **Text**, **Link**, or **Media** post types per template (with optional body text on link and media posts).
+  - Add a **Post Flair ID** in template settings to pre-select that flair when posting manually or apply it automatically on scheduled posts.
   - Schedule post templates to be submitted ahead of time (once).
   - Schedule post templates to repeat at **daily**, **weekly**, or **monthly** intervals.
   - Automatically sticky and/or lock posts upon posting.
@@ -111,29 +117,15 @@ Relay App is quick and easy to set up in your subreddit! Follow these steps to g
 
 ## 📅 Post Scheduling
 
-Relay App features a custom-built scheduling engine designed to overcome the rigid limitations of Reddit's native post scheduler. The scheduling system works in conjunction with the post template system to optionally automate the posting of selected post templates to your subreddit. 
+Relay App features a custom-built scheduling system designed with mod teams in mind to overcome the limitations of Reddit's native post scheduler. Working alongside the post template system, it lets you automate **up to 5** distinct post templates (supporting **Text**, **Link**, and **Media** posts with optional **Post Flair IDs**). Scheduled posts can be stickied, locked, or both, and previously stickied posts can be automatically unstickied, locked, or both.
 
-While Reddit's built-in scheduler is a useful tool, it has a few significant constraints:
-
-- Reddit's native post scheduling system only allows you to automate a total of **2 stickied posts**. If you want more than two posts to be stickied at a time, you have to manually sticky anything past the first two.
-
-- Because Reddit's native post scheduling system is capped at two automated slots, trying to automate stickied posts or events after the limit of 2 has been reached results in bumping off existing stickied posts, requiring moderators to re-sticky posts they still need stickied.
-
-These issues can be quite frustrating for moderators in need of automating more than 2 posts that need to be stickied. Relay App expands your subreddit's prime real estate by leveraging the full 6-post limit of the modern Reddit Community Highlights system.
-
-- Relay App allows you to schedule and automate **up to five** distinct templates.
-
-- Scheduled posts can be stickied, locked, or both, and previously stickied posts can be automatically unstickied, locked, or both.
-
-- Relay App bypasses Reddit's native post scheduler limit of 2 stickied posts, allowing you to automate up to **5 sticked posts**.
-
-- By capping our template system at five slots, Relay App intentionally leaves one permanent manual slot open. This ensures your mod team always has room to manually sticky an emergency announcement, a breaking news thread, or other post without the app accidentally overwriting it.
+Because Relay App bypasses Reddit's native 2-sticky scheduling cap, you can automate **up to 5 stickied posts** at once. Templates are intentionally capped at 5 slots to leave one of Reddit's 6 Community Highlights slots permanently open, ensuring your mod team always has room to manually sticky an emergency announcement, breaking news thread, or a Devvit app interface without Relay App overwriting it.
 
 ### Using the Scheduling System
 
 The scheduling system works in conjunction with the **Post Template system** to automate subreddit posts. Follow these steps to use it:
 
-1. **Create Post Templates** – Set up your post templates in the app settings.
+1. **Create Post Templates** – Set up your post templates in the app settings (select Text, Link, or Media post type and optionally add a Post Flair ID).
 
 2. **Enable Scheduling** – Enable scheduling on the templates you want to schedule and specify their timing (All scheduled posts use UTC time).
 
@@ -216,9 +208,12 @@ Track upcoming features, planned updates, and known issues for all my Devvit app
 
 ## 🚀 Changelog
 
-**Latest Version:** v1.2.3
+**Latest Version:** v1.2.4
 
-* Added additional console logs to identify issue with media post template scheduling.
+* Added post flair selection for manual posting and post templates.
+* Added dynamic variable support for manual posting and post templates.
+* Added fix to upgrade notifier for accidental spaces.
+* Updated app to latest Devvit version (0.15.4).
 
 For the full changelog, please visit the Relay App [GitHub](https://github.com/ItsNovrix/Relay-App).
 

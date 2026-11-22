@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { reddit, settings } from "@devvit/web/server";
+import { getVariableTimezone, applyDynamicVariables } from "../utils/helpers.js";
 
 export const handleEditPostForm = async (c: Context) => {
   const event = await c.req.json();
@@ -12,17 +13,38 @@ export const handleEditPostForm = async (c: Context) => {
   const getPost = await reddit.getPostById(targetId);
   const oldBody = getPost.body;
   
-  const newPostBody = event.nBody || event.values?.nBody;
+  const timezone = await getVariableTimezone();
+  const newPostBody = applyDynamicVariables(event.nBody || event.values?.nBody, subreddit, timezone);
   const reasonRev = event.reasonRevision || event.values?.reasonRevision || "No reason provided";
   const distinguishPost = event.mybDist ?? event.values?.mybDist;
   const stickyPost = event.iSticky ?? event.values?.iSticky;
   const lockPost = event.iLock ?? event.values?.iLock;
+  const rawPostFlair = event.postFlairId ?? event.values?.postFlairId;
+  const selectedFlair = ((Array.isArray(rawPostFlair) ? rawPostFlair[0] : rawPostFlair) as string || "").trim();
 
   if (distinguishPost === false) { getPost.undistinguish(); } else { getPost.distinguish(); }
   if (stickyPost === false) { getPost.unsticky(); } else { getPost.sticky(); }
   if (lockPost === false) { await getPost.unlock(); } else { await getPost.lock(); }
 
   await getPost.edit({ text: newPostBody });
+
+  if (selectedFlair === "remove") {
+    try {
+      await reddit.removePostFlair(subreddit.name, getPost.id);
+    } catch (err) {
+      console.warn(`[Edit Post] Could not remove post flair:`, err);
+    }
+  } else if (selectedFlair && selectedFlair !== "keep") {
+    try {
+      await reddit.setPostFlair({
+        subredditName: subreddit.name,
+        postId: getPost.id,
+        flairTemplateId: selectedFlair,
+      });
+    } catch (err) {
+      console.warn(`[Edit Post] Could not apply post flair "${selectedFlair}":`, err);
+    }
+  }
 
   await reddit.addModNote({
     subreddit: subreddit.name,

@@ -16,11 +16,11 @@ export const handleAppUpgrade = async (c: Context) => {
 
     /* WHAT'S NEW */
     firstMsg += `**What's new (highlights):**\n\n\n`;
-    firstMsg += `- **Post Templates Update** — Added link / media post type functionality to post templates.\n`;
-    firstMsg += `- **App User Flair Update** — Reworked functionality for toggling default Relay App user flair.\n`;
+    firstMsg += `- **Post Flair Selection** — Added post flair selection for manual posting and post templates.\n`;
+    firstMsg += `- **Dynamic Variable Support** — Added dynamic variable support for manual posting and post templates.\n`;
+    firstMsg += `- **Post Templates Update** — Added link / media post type functionality.\n`;
     firstMsg += `- **Post Scheduling Update** — Added daily post scheduling option.\n`;
-    firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release (0.15.3).\n`;
-    firstMsg += `- **App Upgrade Notifier** — Relay App now has an app upgrade notifier to alert mod teams when an upgrade is available for Relay App (this can be toggled off in the app settings).\n\n`;
+    firstMsg += `- **Devvit Version Update** — Relay App has been updated to the latest Devvit release (0.15.4).\n\n`;
 
     /* REMINDERS */
     firstMsg += `**Good to know / reminders:**\n\n\n`;
@@ -30,6 +30,7 @@ export const handleAppUpgrade = async (c: Context) => {
     firstMsg += `- **Reply notifications only monitor the first 24 hours** after a post/comment is made by Relay App due to Reddit limitations.\n`;
     firstMsg += `- **Publish/edit notifications are OFF by default** on submit and on edit of a mod post.\n`;
     firstMsg += `- **Discord notifications** are supported (add your webhook in settings). Note: very long bodies may hit Discord’s payload limits.\n\n`;
+    firstMsg += `- **App upgrade notifications are ON by default** but can easily be toggled off in the app settings.\n\n`;
     firstMsg += `- You can **permanently delete** posts/comments created by the app (not just remove) — use with care.\n\n`;
     firstMsg += `- To use the app, you need **Post** or **Everything** permissions.\n\n`;
 
